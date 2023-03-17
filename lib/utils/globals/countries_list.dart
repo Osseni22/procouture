@@ -1,0 +1,57 @@
+class Country {
+  int? id;
+  String? frenchName;
+  String? englishName;
+
+  Country(this.id,this.frenchName,this.englishName);
+}
+
+List<Country> countryList = [
+  Country(1, "Afrique du Sud", "englishName"),
+  Country(2, "Algérie", "englishName"),
+  Country(3, "Allemagne", "englishName"),
+  Country(4, "Angola", "englishName"),
+  Country(5, "Arabie saoudite", "englishName"),
+  Country(6, "Belgique", "englishName"),
+  Country(7, "Bénin", "englishName"),
+  Country(8, "Burkina Faso", "englishName"),
+  Country(9, "Burundi", "englishName"),
+  Country(10, "Cambodge", "englishName"),
+  Country(11, "Cameroun", "englishName"),
+  Country(12, "Cap-Vert", "englishName"),
+  Country(13, "République centrafricaine", "englishName"),
+  Country(14, "République démocratique du Congo", "englishName"),
+  Country(15, "Congo", "englishName"),
+  Country(16, "Côte d'Ivoire", "englishName"),
+  Country(17, "Égypte", "englishName"),
+  Country(18, "Éthiopie", "englishName"),
+  Country(19, "France", "englishName"),
+  Country(20, "Gabon", "englishName"),
+  Country(21, "Gambie", "englishName"),
+  Country(22, "Ghana", "englishName"),
+  Country(23, "Guinée", "englishName"),
+  Country(24, "Guinée-Bissau", "englishName"),
+  Country(25, "Guinée équatoriale", "englishName"),
+  Country(26, "Kenya", "englishName"),
+  Country(27, "Liberia", "englishName"),
+  Country(28, "Madagascar", "englishName"),
+  Country(29, "Mali", "englishName"),
+  Country(30, "Maroc", "englishName"),
+  Country(31, "Mauritanie", "englishName"),
+  Country(32, "Mozambique", "englishName"),
+  Country(33, "Namibie", "englishName"),
+  Country(34, "Niger", "englishName"),
+  Country(35, "Nigeria", "englishName"),
+  Country(36, "Ouganda", "englishName"),
+  Country(37, "Royaume-Uni", "englishName"),
+  Country(38, "Sénégal", "englishName"),
+  Country(39, "Somalie", "englishName"),
+  Country(40, "Soudan", "englishName"),
+  Country(41, "Tanzanie", "englishName"),
+  Country(42, "Tchad", "englishName"),
+  Country(43, "Togo", "englishName"),
+  Country(44, "Tunisie", "englishName"),
+  Country(45, "Zambie", "englishName"),
+  Country(46, "Zimbabwe", "englishName"),
+  Country(47, "Autres", "englishName"),
+];
