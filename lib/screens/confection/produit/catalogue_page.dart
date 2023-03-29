@@ -31,6 +31,7 @@ class _CataloguePageState extends State<CataloguePage> {
 
   List<Map<String, dynamic>> categories = [];
   List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> productsByCategorie = [];
 
   @override
   void initState() {
@@ -60,15 +61,16 @@ class _CataloguePageState extends State<CataloguePage> {
                         onTap: (){
                           setState(() {
                             selectedIndex = index;
+                            runFilter(categories[index]['id'].toString());
                           });
                         },
                         child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 15),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: index == selectedIndex? Colors.white : Colors.transparent,
+                              color: index == selectedIndex ? Colors.white : Colors.transparent,
                               borderRadius: BorderRadius.circular(24),
-                              border: index == selectedIndex? Border.all(color: Colors.grey, width: 1) : Border.all(color: Colors.transparent, width: 0),
+                              border: index == selectedIndex ? Border.all(color: Colors.grey, width: 1) : Border.all(color: Colors.transparent, width: 0),
                             ),
                             margin: const EdgeInsets.symmetric(horizontal: 5),
                             child: textRaleway(categories[index]['libelle'], 15,Colors.black, TextAlign.start)
@@ -85,14 +87,14 @@ class _CataloguePageState extends State<CataloguePage> {
                   color: Colors.transparent,
                   child: ListView.builder(
                       physics: BouncingScrollPhysics(),
-                      itemCount: products.length,
+                      itemCount: productsByCategorie.length,
                       itemBuilder: (BuildContext context, int currentIndex) => Stack(
                         children: [
                           Container(
                             height: 170,
                             margin: EdgeInsets.only(bottom: 15),
                             decoration: BoxDecoration(
-                              color: (currentIndex % 2 == 0)? Colors.orangeAccent.withOpacity(0.7): Colors.black.withOpacity(0.7),
+                              color: (currentIndex % 2 == 0) ? Colors.orangeAccent.withOpacity(0.7): Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(22),
                               //boxShadow: [kDefaultBoxShadow],
                             ),
@@ -117,8 +119,13 @@ class _CataloguePageState extends State<CataloguePage> {
                                       borderRadius: BorderRadius.circular(18),
                                       //border: Border.all(),
                                       image: DecorationImage(
-                                        image: products[currentIndex]['image_av'] != null ? NetworkImage(products[currentIndex]['image_av'],) : AssetImage('assets/images/shirt_logo.png') as ImageProvider,
+                                        image: productsByCategorie[currentIndex]['image_av'] != null ?
+                                              NetworkImage(productsByCategorie[currentIndex]['image_av'],
+                                                //errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) => Icon(Icons.error),
+                                              )
+                                            : AssetImage('assets/images/shirt_logo.png') as ImageProvider,
                                         fit: BoxFit.cover,
+
                                       )
                                   ),
                                   //child: Image.asset('assets/images/chemise1.jpg',fit: BoxFit.cover,),
@@ -140,7 +147,7 @@ class _CataloguePageState extends State<CataloguePage> {
                                         bottomRight: Radius.circular(22)
                                     )
                                 ),
-                                child: textMontserrat(products[currentIndex]['prix_ht'], 15, Colors.black, TextAlign.start),
+                                child: textMontserrat(productsByCategorie[currentIndex]['prix_ht'].toString(), 15, Colors.black, TextAlign.start),
                               )
                           ),
                           Positioned(
@@ -150,7 +157,7 @@ class _CataloguePageState extends State<CataloguePage> {
                                 height: 115,
                                 width: 160,
                                 alignment: Alignment.centerLeft,
-                                child: textRaleway(products[currentIndex]['libelle'], 16, Colors.black, TextAlign.start),
+                                child: textRaleway(productsByCategorie[currentIndex]['libelle'], 16, Colors.black, TextAlign.start),
                               )
                           ),
                           Positioned(
@@ -166,7 +173,9 @@ class _CataloguePageState extends State<CataloguePage> {
                                     CircleAvatar(
                                         backgroundColor: Colors.grey[100],
                                         child: IconButton(
-                                          onPressed: (){},
+                                          onPressed: () async {
+                                            await Navigator.push(context, MaterialPageRoute(builder: (context) => ProduitSave(pageMode: 'M', categories: categories, productMap: productsByCategorie[currentIndex],)));
+                                          },
                                           icon: Icon(Icons.edit_note_rounded),color: Colors.black,)
                                     ),
                                     CircleAvatar(
@@ -201,7 +210,9 @@ class _CataloguePageState extends State<CataloguePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => ProduitSave()));},
+          onPressed: () async {
+            await Navigator.push(context, MaterialPageRoute(builder: (context) => ProduitSave(pageMode: 'A', categories: categories)));
+          },
           child : Icon(CupertinoIcons.add)
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -228,49 +239,51 @@ class _CataloguePageState extends State<CataloguePage> {
 
     loadingProgress(true);
     final response = await http.get(
-      Uri.parse(ProductRoot),
+      Uri.parse(productRoot),
       headers: myHeaders,
     );
     loadingProgress(false);
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
-      print('Status code : ${response.statusCode}');
 
-      if(includeCategorieVetement){
-        categories.clear();
-        for(int i = 0; i < responseBody['data']['categorie_vetements'].length; i++){
-          Map<String, dynamic> dataMap = {
-            "id": responseBody['data']['categorie_vetements'][i]['id'],
-            "libelle": responseBody['data']['categorie_vetements'][i]['libelle'],
+      categories.clear();
+      products.clear();
+      for(int i = 0; i < responseBody['data']['categorie_vetements'].length; i++){
+        Map<String, dynamic> dataMap = {
+          "id": responseBody['data']['categorie_vetements'][i]['id'],
+          "libelle": responseBody['data']['categorie_vetements'][i]['libelle'],
+        };
+        categories.add(dataMap);
+
+        for(int j = 0; j < responseBody['data']['categorie_vetements'][i]['catalogues'].length; j++){
+          //print(responseBody['data']['categorie_vetements'][i]['catalogues'].length);
+          Map<String, dynamic> dataMap2 = {
+            "id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['id'],
+            "ref": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['ref'],
+            "libelle": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['libelle'],
+            "prix_ht": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['prix_ht'],
+            "image_av": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['image_av'],
+            "image_ar": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['image_ar'],
+            "categorie_vetement_id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['categorie_vetement_id'],
+            "base_modele_id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['base_modele_id'],
           };
-          categories.add(dataMap);
+          products.add(dataMap2);
         }
       }
-
-      products.clear();
-      for(int i = 0; i < responseBody['data']['catalogue'].length; i++) {
-        Map<String, dynamic> dataMap2 = {
-          "id": responseBody['data']['catalogue'][i]['id'],
-          "ref": responseBody['data']['catalogue'][i]['ref'],
-          "libelle": responseBody['data']['catalogue'][i]['libelle'],
-          "prix_ht": responseBody['data']['catalogue'][i]['prix_ht'],
-          "image_av": responseBody['data']['catalogue'][i]['image_av'],
-          "image_ar": responseBody['data']['catalogue'][i]['image_ar'],
-          "categorie_vetement_id": responseBody['data']['catalogue'][i]['categorie_vetement_id'],
-          "base_modele_id": responseBody['data']['catalogue'][i]['base_modele_id'],
-          "atelier_id": responseBody['data']['catalogue'][i]['atelier_id'],
-        };
-        products.add(dataMap2);
-      }
-      print('total catalogue' + responseBody['data']['catalogue'].length);
-      //setState(() {foundClients = allClients;});
-
-      // Handle the response
-    } else {
-      Fluttertoast.showToast(msg: "Status code: ${response.statusCode}");
-      throw Exception('Failed to make Bearer auth request.');
     }
+    //productsByCategorie = products;
+    runFilter(categories[selectedIndex]['id'].toString());
+  }
+
+  void runFilter(String categorie_id) {
+    List<Map<String, dynamic>> results = [];
+    for(int i = 0; i < products.length; i++){
+      if(products[i]['categorie_vetement_id'].toString() == categorie_id){
+        results.add(products[i]);
+      }
+    }
+    productsByCategorie = results;
   }
 
 }

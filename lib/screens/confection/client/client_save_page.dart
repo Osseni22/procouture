@@ -10,9 +10,11 @@ import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../utils/globals/global_var.dart';
+
 class ClientSave extends StatefulWidget {
   final String pageMode; Map<String, dynamic>? map;
-  ClientSave({Key? key,required this.pageMode, this.map}) : super(key: key);
+  ClientSave({Key? key, required this.pageMode, this.map}) : super(key: key);
 
   @override
   State<ClientSave> createState() => _ClientSaveState();
@@ -35,11 +37,11 @@ class _ClientSaveState extends State<ClientSave> {
   void initState() {
     if (widget.pageMode == 'M') {
       nomCtrl.text = widget.map?['nom'];
-      telephone1Ctrl.text = widget.map!['telephone1'];
-      telephone2Ctrl.text = widget.map!['telephone2'];
-      villeCtrl.text = widget.map!['ville'];
-      adresseCtrl.text = widget.map!['adresse'];
-      emailCtrl.text = widget.map!['email'];
+      widget.map!['telephone1'] != null ? telephone1Ctrl.text = widget.map!['telephone1'] : telephone1Ctrl.text = '';
+      widget.map!['telephone2'] != null ? telephone2Ctrl.text = widget.map!['telephone2'] : telephone2Ctrl.text = '';
+      widget.map!['ville'] != null ? villeCtrl.text = widget.map!['ville'] : villeCtrl.text = '';
+      widget.map!['adresse'] != null ? adresseCtrl.text = widget.map!['adresse'] : adresseCtrl.text = '';
+      widget.map!['email'] != null ? emailCtrl.text = widget.map!['email'] : emailCtrl.text = '';
     }
     super.initState();
   }
@@ -182,22 +184,23 @@ class _ClientSaveState extends State<ClientSave> {
                   ),
                 ),
                 SizedBox(height: 25,),
+                /// BOUTON DE VALIDATION
                 GestureDetector(
                   onTap: () {
-                    if (emailCtrl.text.isNotEmpty && !EmailValidator.validate(emailCtrl.text)) {
+                    /*if (emailCtrl.text.isNotEmpty && !EmailValidator.validate(emailCtrl.text)) {
                       Fluttertoast.showToast(msg: 'Email incorrect');
                       return;
-                    }
+                    }*/
                     if(nomCtrl.text.isEmpty){
                       Fluttertoast.showToast(msg: 'Renseigner au moins le nom du client');
                       return;
                     }
                     if (widget.pageMode == 'A') {
-                      createClient(nomCtrl.text.toString(), adresseCtrl.text.toString(), villeCtrl.text.toString(),
+                      createClient2(nomCtrl.text.toString(), adresseCtrl.text.toString(), villeCtrl.text.toString(),
                           telephone1Ctrl.text.toString(), telephone2Ctrl.text.toString(),
                           emailCtrl.text.toString());
                     } else {
-                      updateClient(nomCtrl.text, adresseCtrl.text, villeCtrl.text,
+                      updateClient2(nomCtrl.text, adresseCtrl.text, villeCtrl.text,
                           telephone1Ctrl.text, telephone2Ctrl.text,
                           emailCtrl.text);
                     }
@@ -246,6 +249,40 @@ class _ClientSaveState extends State<ClientSave> {
     );
   }
 
+  Future<void> createClient2(String nom, String adresse, String ville,
+      String telephone1, String telephone2, String email) async {
+
+    String bearerToken = 'Bearer ${Globals.token!}';
+    Map<String, String> data = {
+      "nom": nom,
+      "adresse": adresse,
+      "ville": ville,
+      "telephone1": telephone1,
+      "telephone2": telephone2,
+      "email": email,
+    };
+    var headers = {
+      'Accept':'application/json',
+      'Content-Type':'application/json',
+      'Authorization': bearerToken,
+    };
+
+    var request = http.MultipartRequest('POST', Uri.parse(clientRoot));
+    request.fields.addAll(data);
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    print(response.stream.bytesToString());
+
+    if (response.statusCode == 201) {
+      Fluttertoast.showToast(msg: 'Client enregistré avec succès !');
+      Navigator.pop(context);
+    } else {
+      Fluttertoast.showToast(msg: '${response.statusCode} Client pas enregistré !');
+    }
+  }
+
   Future<void> createClient(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
@@ -256,12 +293,11 @@ class _ClientSaveState extends State<ClientSave> {
       "telephone1": telephone1,
       "telephone2": telephone2,
       "email": email,
-
     };
 
     sendingProgress(true);
     final response = await http.post(
-        Uri.parse(ClientRoot),
+        Uri.parse(clientRoot),
         body: json.encode(data),
         headers: {'Content-Type': 'application/json'}
     );
@@ -290,7 +326,7 @@ class _ClientSaveState extends State<ClientSave> {
 
     sendingProgress(true);
     final response = await http.put(
-        Uri.parse('$ClientRoot/${widget.map!['id'].toString()}'),
+        Uri.parse('$clientRoot/${widget.map!['id'].toString()}'),
         body: jsonEncode(data),
         headers: {'Content-type': 'application/json'}
     );
@@ -302,6 +338,41 @@ class _ClientSaveState extends State<ClientSave> {
     } else {
       Fluttertoast.showToast(msg: '${response.statusCode} Client pas enregistré !');
     }
+  }
+
+  Future<void> updateClient2(String nom, String adresse, String ville,
+      String telephone1, String telephone2, String email) async {
+
+    String bearerToken = 'Bearer ${Globals.token!}';
+
+    Map<String, String> data = {
+      "nom": nom,
+      "adresse": adresse,
+      "ville": ville,
+      "telephone1": telephone1,
+      "telephone2": telephone2,
+      "email": email,
+    };
+
+    var headers = {
+      'Accept':'application/json',
+      'Content-Type':'application/json',
+      'Authorization': bearerToken,
+    };
+
+    final response = await http.put(
+      Uri.parse('$clientRoot/${widget.map!['id'].toString()}'),
+      headers: headers,
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 201) {
+      Fluttertoast.showToast(msg: 'Client modifié avec succès !');
+      Navigator.pop(context);
+    } else {
+      Fluttertoast.showToast(msg: '${response.statusCode} Client pas modifié !');
+    }
+
   }
 
   void sendingProgress(bool value) {

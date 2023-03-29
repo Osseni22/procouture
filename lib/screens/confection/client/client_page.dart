@@ -65,6 +65,7 @@ class _ClientPageState extends State<ClientPage> {
           IconButton(onPressed: (){
             setState(() {
               searchBoolean = false;
+              runFilter('');
             });
           },
             icon: Icon(Icons.close), color: Colors.black,
@@ -117,7 +118,21 @@ class _ClientPageState extends State<ClientPage> {
                           ),
                           child: InkWell(
                             splashColor: Colors.orange.withOpacity(0.1),
-                            onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_)=> SessionPage()));},
+                            onTap: () {
+                              Map<String, dynamic> selectedClient = {
+                                "id": foundClients[index]['id'],
+                                "ref": foundClients[index]['ref'],
+                                "nom": foundClients[index]['nom'],
+                                "adresse": foundClients[index]['adresse'],
+                                "ville": foundClients[index]['ville'],
+                                "telephone1": foundClients[index]['telephone1'],
+                                "telephone2": foundClients[index]['telephone2'],
+                                "email": foundClients[index]['email'],
+                                "acompte": foundClients[index]['acompte'],
+                                "atelier_id": foundClients[index]['atelier_id'],
+                              };
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> SessionPage(map: selectedClient)));
+                            },
                             child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.orange,
@@ -128,7 +143,7 @@ class _ClientPageState extends State<ClientPage> {
                                 trailing: CircleAvatar(
                                     backgroundColor: Colors.grey[200],
                                     child: IconButton(
-                                      onPressed: (){
+                                      onPressed: () async {
                                         Map<String, dynamic> selectedClient = {
                                           "id": foundClients[index]['id'],
                                           "ref": foundClients[index]['ref'],
@@ -141,8 +156,9 @@ class _ClientPageState extends State<ClientPage> {
                                           "acompte": foundClients[index]['acompte'],
                                           "atelier_id": foundClients[index]['atelier_id'],
                                         };
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSave(pageMode: 'M', map: selectedClient,)));
-                                        },
+                                        await Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSave(pageMode: 'M', map: selectedClient,)));
+                                        getClientList();
+                                      },
                                       icon: Icon(Icons.edit_note_rounded),color: Colors.black,
                                     )
                                 )
@@ -218,7 +234,7 @@ class _ClientPageState extends State<ClientPage> {
 
       startLoading();
       final response = await http.get(
-        Uri.parse(ClientRoot),
+        Uri.parse(clientRoot),
         headers: myHeaders,
       );
       endLoading();

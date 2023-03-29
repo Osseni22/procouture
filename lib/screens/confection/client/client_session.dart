@@ -16,7 +16,8 @@ import '../commande/client_commande_page.dart';
 import 'package:procouture/screens/confection/client/client_matiere_page.dart';
 
 class SessionPage extends StatefulWidget {
-  const SessionPage({Key? key}) : super(key: key);
+  Map<String, dynamic>? map;
+  SessionPage({Key? key, required this.map}) : super(key: key);
 
   @override
   State<SessionPage> createState() => _SessionPageState();
@@ -26,17 +27,19 @@ class _SessionPageState extends State<SessionPage> {
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String nomClient = 'Osseni Abdel Aziz le King';
-  String tel1 = '+2250102030405';
-  String tel2 = '+2250602030401';
+  late String id;
+  late String nomClient;
+  late String tel1 ;
+  late String tel2 ;
+  late String ville;
 
   @override
   void initState() {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-    ));
+    nomClient = widget.map!['nom'];
+    id = widget.map!['id'].toString();
+    widget.map!['telephone1'] != null ? tel1 = widget.map!['telephone1'] : tel1 = '';
+    widget.map!['telephone2'] != null ? tel2 = widget.map!['telephone2'] : tel2 = '';
+    widget.map!['ville'] != null ? ville = widget.map!['ville'] : ville = '';
     super.initState();
   }
 
@@ -129,7 +132,7 @@ class _SessionPageState extends State<SessionPage> {
                                   children: [
                                     Icon(CupertinoIcons.phone,color: Colors.green,),
                                     SizedBox(width: 8,),
-                                    textWorkSans('01 02 03 04 05 / 06 07 08 09'.substring(0,24), 12, Colors.white, TextAlign.left)
+                                    textWorkSans(tel1, 14, Colors.white, TextAlign.left)
                                   ],
                                 ),
                               )
@@ -149,7 +152,7 @@ class _SessionPageState extends State<SessionPage> {
                                   children: [
                                     Icon(CupertinoIcons.location_solid,color: Colors.green,),
                                     SizedBox(width: 8,),
-                                    textWorkSans('Grand-Bassam'.toUpperCase(), 12, Colors.white, TextAlign.left)
+                                    textWorkSans(ville.toUpperCase(), 14, Colors.white, TextAlign.left)
                                   ],
                                 ),
                               )                          ),
@@ -408,9 +411,9 @@ class _SessionPageState extends State<SessionPage> {
           textRaleway('Appeler le :', 18, Colors.black, TextAlign.center, fontWeight: FontWeight.bold),
           //SizedBox(height: 10,),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
+              (tel1 != '') ? Container(
                 height: 45,
                 width: MediaQuery.of(context).size.width * 0.45,
                 child: OutlinedButton(
@@ -419,12 +422,12 @@ class _SessionPageState extends State<SessionPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Icon(Icons.phone, color: Colors.green, size: 18,),
-                      textMontserrat(tel1, 14, Colors.green, TextAlign.center),
+                      textOpenSans(tel1, 14, Colors.black87, TextAlign.center, fontWeight: FontWeight.bold),
                     ],
                   ),
                 ),
-              ),
-              Container(
+              ): SizedBox(),
+              (tel2 != '') ? Container(
                 height: 45,
                 width: MediaQuery.of(context).size.width * 0.45,
                 child: OutlinedButton(
@@ -433,11 +436,11 @@ class _SessionPageState extends State<SessionPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Icon(Icons.phone, color: Colors.green, size: 18,),
-                      textMontserrat(tel2, 14, Colors.green, TextAlign.center),
+                      textOpenSans(tel2, 14, Colors.black87, TextAlign.center, fontWeight: FontWeight.bold),
                     ],
-                  ),
+                  ) ,
                 ),
-              ),
+              ): SizedBox(),
             ],
           ),
         ],

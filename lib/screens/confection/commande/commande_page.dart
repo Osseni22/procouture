@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:datetime_picker_formfield_new/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,11 @@ import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:procouture/widgets/default_box_shadow.dart';
+
+import '../../../services/api_routes/routes.dart';
+import '../../../utils/globals/global_var.dart';
 
 class CommandePage extends StatefulWidget {
   const CommandePage({Key? key}) : super(key: key);
@@ -28,9 +34,11 @@ class _CommandePageState extends State<CommandePage> {
     'Terminée',
     'Annulée'
   ];
-  String etatCmdeValue = 'En Attente';
 
+  String etatCmdeValue = 'En Attente';
   bool isLoading = false;
+
+  List<Map<String, dynamic>> commandes = [];
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +132,7 @@ class _CommandePageState extends State<CommandePage> {
                             ),
                           ),
                           const SizedBox(width: 10,),
+
                           // Afficher le bouton de recherche
                           Container(alignment: Alignment.center,
                             width: 70,
@@ -141,6 +150,7 @@ class _CommandePageState extends State<CommandePage> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -178,18 +188,17 @@ class _CommandePageState extends State<CommandePage> {
               ),
             ),
           ),
-
           const SizedBox(height: 15),
           Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   itemCount: 5,
                   itemBuilder: (context, int index) => GestureDetector(
                     onTap: (){ print('OK'); },
                     child: Container(
-                      margin: EdgeInsets.only(bottom: 15),
+                      margin: const EdgeInsets.only(bottom: 15),
                       height: 230,
                       decoration: BoxDecoration(
                           color: Colors.white,
@@ -409,7 +418,6 @@ class _CommandePageState extends State<CommandePage> {
                                                 ),
                                               ),
                                             ],
-
                                             elevation: 10,
                                             // on selected we show the dialog box
                                             onSelected: (value) {
@@ -472,6 +480,45 @@ class _CommandePageState extends State<CommandePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void loadingProgress(bool value){
+    if(value){
+      setState(() { isLoading = true;});
+    } else {
+      setState(() { isLoading = false;});
+    }
+  }
+
+  Future<void> getCommandesList() async {
+
+    String token = Globals.token!;
+    String bearerToken = 'Bearer $token';
+
+    var myHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': bearerToken
+    };
+
+    loadingProgress(true);
+    final response = await http.get(
+      Uri.parse(commandeRoot),
+      headers: myHeaders,
+    );
+    loadingProgress(false);
+
+    if(response.statusCode == 200) {
+
+      final responseBody = jsonDecode(response.body);
+      commandes.clear();
+
+      for(int i = 0; i < responseBody['data']['commandes'].length; i++) {
+
+      }
+
+    }
+
   }
 
 }
