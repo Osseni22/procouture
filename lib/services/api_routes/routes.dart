@@ -6,15 +6,21 @@ const String Root = "https://api.procouturemobile.com";
 //const String REGISTRATION = "$Root/api/registration.php";
 
 // Login
-const String loginRoot = "$Root/api/login";
+const String r_login = "$Root/api/login";
+
+// Login Admin
+const String r_loginAdmin = "$Root/api/compte/login";
+
+// Afficher la liste des ateliers
+const String r_ateliers = "$Root/api/ateliers";
 
 // Gestion des clients
-const String clientRoot = "$Root/api/clients";
+const String r_client = "$Root/api/clients";
 
 // Gestion des produits
-const String productRoot = "$Root/api/catalogues";
+const String r_product = "$Root/api/catalogues";
 
 // Gestion des commandes
-const String commandeRoot = "$Root/api/Commandes_id";
+const String r_commande = "$Root/api/commandes";
 
 //

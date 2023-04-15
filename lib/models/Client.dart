@@ -8,7 +8,7 @@ class Client{
   String? telephone1;
   String? telephone2;
   String? email;
-  double? acompte;
+  int? acompte;
   int? atelier_id;
 
   // Constructor
@@ -29,10 +29,10 @@ class Client{
   factory Client.fromJson(Map<String, dynamic> json){
     return Client(
       id: json['id'],
-      ref: json['nom'],
-      nom: json['prenom'],
-      adresse: json['email'],
-      ville: json['atelier_id'],
+      ref: json['ref'],
+      nom: json['nom'],
+      adresse: json['adresse'],
+      ville: json['ville'],
       telephone1: json['telephone1'],
       telephone2: json['telephone2'],
       email: json['email'],

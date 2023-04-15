@@ -58,11 +58,6 @@ class _ProduitSaveState extends State<ProduitSave> {
       final pickedFile = await _picker.pickImage(source: source);
       setState(() {
         _imageFileAv = File(pickedFile!.path);
-        /*print("CATEGORIE ID ${getCategorieVetementId()}");
-        print("CATEGORIE STRING ${itemsCategories[0]['libelle']}");
-        print("CATEGORIEHOLDER $categorieValueHolder");
-        print("BASE MODELE ${getBaseModele()}");
-        //print(" ${getBaseModele()}");*/
       });
     } catch (e) {
       print('Error: $e');
@@ -403,8 +398,9 @@ class _ProduitSaveState extends State<ProduitSave> {
                         print('Image size after $sizeAfter kb');
                       }
                       createProduct(getCategorieVetementId()!, designationCtrl.text, prixHtCtrl.text, getBaseModele()!);
-
-                    } else { /// SI ON EST EN MODE MODIFICATION
+                    }
+                    /// SI ON EST EN MODE MODIFICATION
+                    else {
                       // Faire des vérifications et la validation des champs
                       if(designationCtrl.text.isEmpty || prixHtCtrl.text.isEmpty || categorieValue!.isEmpty || baseModeleValue!.isEmpty) {
                         Fluttertoast.showToast(msg: 'Tous les champs sont obligatoires !');
@@ -466,8 +462,7 @@ class _ProduitSaveState extends State<ProduitSave> {
                               color: Colors.white, strokeWidth: 2.0),
                         ) : const SizedBox()
                       ],
-                    )
-                    ,
+                    ),
                   ),
                 )
               ],
@@ -489,7 +484,7 @@ class _ProduitSaveState extends State<ProduitSave> {
       "base_modele": base_modele,
     };
 
-    String bearerToken = 'Bearer ${Globals.token!}';
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
     var headers = {
       'Accept':'application/json',
       'Content-Type':'application/json',
@@ -497,7 +492,7 @@ class _ProduitSaveState extends State<ProduitSave> {
     };
 
     // create multipart request for POST
-    final request = http.MultipartRequest('POST', Uri.parse(productRoot));
+    final request = http.MultipartRequest('POST', Uri.parse(r_product));
 
     // add image file to multipart request
     if(_imageFileAvCompressed != null){
@@ -549,7 +544,7 @@ class _ProduitSaveState extends State<ProduitSave> {
       "_method" : "PUT"
     };
 
-    String bearerToken = 'Bearer ${Globals.token!}';
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
     var headers = {
       'Accept':'application/json',
       'Content-Type':'application/json',
@@ -558,7 +553,7 @@ class _ProduitSaveState extends State<ProduitSave> {
     };
 
     // create multipart request for POST
-    final request = http.MultipartRequest('POST', Uri.parse("$productRoot/${widget.productMap!['id'].toString()}"));
+    final request = http.MultipartRequest('POST', Uri.parse("$r_product/${widget.productMap!['id'].toString()}"));
 
     // add image file to multipart request
     if(_imageFileAvCompressed != null){

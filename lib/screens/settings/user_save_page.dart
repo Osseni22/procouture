@@ -1,10 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:procouture/utils/constants/color_constants.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
+import 'package:http/http.dart' as http;
+
+import '../../models/User.dart';
+import '../../services/api_routes/routes.dart';
+import '../../utils/globals/global_var.dart';
 
 class UserSave extends StatefulWidget {
-  const UserSave({Key? key}) : super(key: key);
+  final String pageMode; final int atelier_id;
+  UserSave({Key? key, required this.pageMode, required this.atelier_id}) : super(key: key);
 
   @override
   State<UserSave> createState() => _UserSaveState();
@@ -14,10 +23,24 @@ class _UserSaveState extends State<UserSave> {
 
   bool isSaving = false;
 
+  TextEditingController nomCtrl = TextEditingController(text: '');
+  TextEditingController prenomCtrl = TextEditingController(text: '');
+  TextEditingController userNameCtrl = TextEditingController(text: '');
+  TextEditingController emailCtrl = TextEditingController(text: '');
+  TextEditingController motDePasseCtrl = TextEditingController(text: '');
+  TextEditingController motDePasseCtrl2 = TextEditingController(text: '');
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myDefaultAppBar('Enregistrement utilisateur', context, textSize: 18),
+      appBar: myDefaultAppBar('Fiche Utilisateur', context, textSize: 18),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -26,7 +49,7 @@ class _UserSaveState extends State<UserSave> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  height: 340,
+                  height: 400,
                   padding:  EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -48,11 +71,11 @@ class _UserSaveState extends State<UserSave> {
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
-                          //controller: ,
+                          controller: nomCtrl,
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Nom ',
+                              hintText: 'Nom',
                               hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
@@ -64,11 +87,27 @@ class _UserSaveState extends State<UserSave> {
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
-                          //controller: ,
-                          keyboardType: TextInputType.phone,
+                          controller: prenomCtrl,
+                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Telephone',
+                              hintText: 'Prénom(s)',
+                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          //color: Colors.white,
+                            border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
+                        ),
+                        child: TextField(
+                          controller: userNameCtrl,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Nom utilisateur',
                               hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
@@ -80,7 +119,7 @@ class _UserSaveState extends State<UserSave> {
                           border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
-                          //controller: ,
+                          controller: emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -96,7 +135,7 @@ class _UserSaveState extends State<UserSave> {
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
-                          //controller: ,
+                          controller: motDePasseCtrl,
                           keyboardType: TextInputType.text,
                           obscureText: true,
                           decoration: InputDecoration(
@@ -113,7 +152,7 @@ class _UserSaveState extends State<UserSave> {
                             //border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
-                          //controller: ,
+                          controller: motDePasseCtrl2,
                           keyboardType: TextInputType.text,
                           obscureText: true,
                           decoration: InputDecoration(
@@ -128,7 +167,22 @@ class _UserSaveState extends State<UserSave> {
                 ),
                 SizedBox(height: 25,),
                 GestureDetector(
-                  onTap: (){print('OK');},
+                  onTap: (){
+                    if(allOK()){
+                      if(widget.pageMode == 'A'){
+                        User user = User(
+                            id: 0,
+                            nom: nomCtrl.text,
+                            prenom: prenomCtrl.text,
+                            email: emailCtrl.text,
+                            username: userNameCtrl.text,
+                            atelier_id: widget.atelier_id,
+                            password: motDePasseCtrl.text
+                        );
+                        createUser(user);
+                      }
+                    }
+                  },
                   child: Container(
                     alignment: Alignment.center,
                     height: 60,
@@ -136,7 +190,7 @@ class _UserSaveState extends State<UserSave> {
                     padding:  EdgeInsets.all(5),
                     decoration: BoxDecoration(
                         color: kProcouture_green,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -166,6 +220,7 @@ class _UserSaveState extends State<UserSave> {
       ),
     );
   }
+
   void savingIndicator(bool showIndicator){
     if(showIndicator){
       setState(() {
@@ -177,4 +232,52 @@ class _UserSaveState extends State<UserSave> {
       });
     }
   }
+
+  bool allOK(){
+    if(nomCtrl.text.isEmpty){
+      Fluttertoast.showToast(msg: "Nom obligatoire");
+      return false;
+    }
+    if(userNameCtrl.text.isEmpty){
+      Fluttertoast.showToast(msg: "Nom de l'utilisateur obligatoire");
+      return false;
+    }
+    if(motDePasseCtrl.text.length < 6){
+      Fluttertoast.showToast(msg: "Mot de passe : 6 caractères au minimum");
+      return false;
+    }
+    if(motDePasseCtrl.text != motDePasseCtrl2.text){
+      Fluttertoast.showToast(msg: "Mots de passe non identiques");
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> createUser(User user) async {
+
+    Map<String, dynamic> data = user.toJson();
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
+
+    savingIndicator(true);
+    final response = await http.post(
+        Uri.parse('$r_ateliers/${widget.atelier_id}/users'),
+        body: json.encode(data),
+        headers: {
+          'Accept':'application/json',
+          'Content-Type':'application/json',
+          'Authorization': bearerToken,
+        }
+    );
+    savingIndicator(false);
+
+    if (response.statusCode == 201) {
+      Fluttertoast.showToast(msg: 'Utilisateur enregistré avec succès !');
+      Navigator.pop(context);
+    } else {
+      Fluttertoast.showToast(msg: '${response.statusCode} Utilisateur pas enregistré !');
+      final responseBody = jsonDecode(response.body);
+      print(responseBody);
+    }
+  }
+
 }

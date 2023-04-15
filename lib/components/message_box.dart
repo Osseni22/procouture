@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:procouture/screens/home/login.dart';
+import 'package:procouture/utils/globals/global_var.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'dart:io' show Platform, exit;
 
@@ -155,6 +157,83 @@ Future<bool> msgBoxLogOut(BuildContext context) async {
             }
         ),
       ],
+    ),
+  )
+  ) ?? false;
+}
+
+Future<bool> showModeleSourcePage(BuildContext context) async {
+  return (await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Source du modèle'),
+      shape: const RoundedRectangleBorder( // <-- SEE HERE
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(15.0),
+          bottom: Radius.circular(15.0),
+        ),
+      ),
+      content: Container(
+        height: 120,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: (){
+                Globals.modeleSource = 1;
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                    children: [
+                      FaIcon(FontAwesomeIcons.blackTie, color: Colors.blueGrey, size: 21,),
+                      SizedBox(width: 19,),
+                      textMontserrat("Catalogue",17,Colors.blueGrey,TextAlign.left),
+                    ],
+                ),
+              ),
+            ),
+            SizedBox(height: 5,),
+            Divider(),
+            GestureDetector(
+              onTap: (){
+                Globals.modeleSource = 2;
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                    children: [
+                      Icon(Icons.camera, color: Colors.blueGrey, size: 25,),
+                      SizedBox(width: 15,),
+                      textMontserrat("Camera",17,Colors.blueGrey,TextAlign.left),
+                    ],
+                ),
+              ),
+            ),
+            SizedBox(height: 5,),
+            Divider(),
+            GestureDetector(
+              onTap: (){
+                Globals.modeleSource = 3;
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                    children: [
+                      Icon(Icons.image,color: Colors.blueGrey, size: 25,),
+                      SizedBox(width: 15,),
+                      textMontserrat("Galerie",17,Colors.blueGrey,TextAlign.left),
+                    ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   )
   ) ?? false;

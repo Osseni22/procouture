@@ -3,16 +3,23 @@ import 'dart:convert';
 import 'package:datetime_picker_formfield_new/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:procouture/screens/confection/caisse/depenses_commande_page.dart';
 import 'package:procouture/screens/confection/caisse/reglement_page.dart';
+import 'package:procouture/screens/confection/commande/commande_save_page.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
+import 'package:procouture/models/Client.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:procouture/widgets/default_box_shadow.dart';
 
+import '../../../models/CategorieVetement.dart';
+import '../../../models/Commande.dart';
+import '../../../models/LigneCommande.dart';
+import '../../../models/Product.dart';
 import '../../../services/api_routes/routes.dart';
 import '../../../utils/globals/global_var.dart';
 
@@ -38,7 +45,29 @@ class _CommandePageState extends State<CommandePage> {
   String etatCmdeValue = 'En Attente';
   bool isLoading = false;
 
-  List<Map<String, dynamic>> commandes = [];
+  // Get all the commandes in a list
+  List<Commande> commandesAll = [];
+
+  // Get all lignes commandes in a list
+  List<LigneCommande> ligneCommandesAll = [];
+
+  /// Load informations before going to save page
+  // Get all client liste
+  List<Client> allClients = [];
+  // Categories
+  List<CategorieVetement> allCategories = [];
+  // Products
+  List<Product> allProducts = [];
+  // If all data are loaded correctly
+  bool isProductOk = false;
+  bool isClientOk = false;
+
+  @override
+  void initState() {
+    getCommandesList();
+    print(ligneCommandesAll);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +86,12 @@ class _CommandePageState extends State<CommandePage> {
               //color: Colors.blue,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(13)
+                borderRadius: BorderRadius.circular(13),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  /// INFORMATIONS DE FILTRAGE
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Container(
@@ -188,13 +218,14 @@ class _CommandePageState extends State<CommandePage> {
               ),
             ),
           ),
+          /// AFFICHAGE DES COMMANDES
           const SizedBox(height: 15),
           Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ListView.builder(
                   physics: const BouncingScrollPhysics(),
-                  itemCount: 5,
+                  itemCount: commandesAll.length,
                   itemBuilder: (context, int index) => GestureDetector(
                     onTap: (){ print('OK'); },
                     child: Container(
@@ -224,19 +255,19 @@ class _CommandePageState extends State<CommandePage> {
                                           alignment: Alignment.centerLeft,
                                           child: Visibility(
                                             visible: true,
-                                            child: textOpenSans('Soldée', 13, Colors.red, TextAlign.center),
+                                            child: textRaleway(commandesAll[index].etat!, 12, Colors.red, TextAlign.center),
                                           ),
                                         ),
                                         Container(
                                           width: 160,
-                                          child:  textOpenSans('Cmde N°${index+1}', 16, Colors.black, TextAlign.center),
+                                          child:  textOpenSans("Cmde ${commandesAll[index].id}", 16, Colors.black, TextAlign.center),
                                         ),
                                         Container(
                                           width: 80,
                                           alignment: AlignmentDirectional.centerEnd,
                                           child: Visibility(
                                             visible: true,
-                                            child: textRaleway('Ref${index+1}', 12, Colors.black26, TextAlign.right),
+                                            child: textWorkSans(commandesAll[index].ref!, 12, Colors.black26, TextAlign.right),
                                           ),
                                         ),
                                       ],
@@ -245,7 +276,7 @@ class _CommandePageState extends State<CommandePage> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        textOpenSans('Client ${index+1}', 16, Colors.green, TextAlign.center),
+                                        textOpenSans(commandesAll[index].client!.toUpperCase(), 16, Colors.green, TextAlign.center),
                                       ],
                                     ),
                                     // Afficher les dates
@@ -253,36 +284,36 @@ class _CommandePageState extends State<CommandePage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         textOpenSans('Date Cmde : ', 11, Colors.black, TextAlign.center),
-                                        textOpenSans('31/12/2023', 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
+                                        textOpenSans(commandesAll[index].date_commande!, 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
                                         textOpenSans('Date Livr. : ', 11, Colors.black, TextAlign.center),
-                                        textOpenSans('31/12/2023', 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
+                                        textOpenSans(commandesAll[index].date_prev_livraison!, 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
                                       ],
                                     ),
                                     // Montant TTC
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(alignment: AlignmentDirectional.centerEnd,child: textOpenSans('Montant TTC : ', 13, Colors.black, TextAlign.center)),
+                                        Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant TTC : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(alignment: Alignment.centerLeft, child: textOpenSans('205000 FCA', 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans(commandesAll[index].montant_ttc.toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     // Montant Regle
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(alignment: AlignmentDirectional.centerEnd,child: textOpenSans('Montant réglé : ', 13, Colors.black, TextAlign.center)),
+                                        Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant réglé : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(alignment: Alignment.centerLeft, child: textOpenSans('205000 FCA', 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans(commandesAll[index].montant_recu.toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     // Montant Restant
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(alignment: AlignmentDirectional.centerEnd,child: textOpenSans('Montant restant : ', 13, Colors.black, TextAlign.center)),
+                                        Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant restant : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(alignment: Alignment.centerLeft, child: textOpenSans('205000 FCA', 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100, alignment: Alignment.centerLeft, child: textOpenSans((commandesAll[index].montant_ttc! - commandesAll[index].montant_recu!).toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ],
@@ -320,19 +351,24 @@ class _CommandePageState extends State<CommandePage> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 3.0),
-                                    child: Container(
-                                      width: 60,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(30)
-                                      ),
-                                      //color: Colors.blueAccent,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Icon(Icons.edit_note, color: Colors.black,)
-                                        ],
+                                    child: GestureDetector(
+                                      onTap:(){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'M', cmde: commandesAll[index], ligneCdes: getLigneCommandes(commandesAll[index].id!),)));
+                                      },
+                                      child: Container(
+                                        width: 60,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.circular(30)
+                                        ),
+                                        //color: Colors.blueAccent,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Icon(Icons.edit_note, color: Colors.black,)
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -409,10 +445,7 @@ class _CommandePageState extends State<CommandePage> {
                                                 child: Row(
                                                   children: [
                                                     Icon(Icons.my_library_books_rounded, color: Colors.grey),
-                                                    SizedBox(
-                                                      // sized box with width 10
-                                                      width: 10,
-                                                    ),
+                                                    SizedBox(width: 10,),
                                                     textOpenSans("Facture",16,Colors.black,TextAlign.left)
                                                   ],
                                                 ),
@@ -474,8 +507,10 @@ class _CommandePageState extends State<CommandePage> {
           )
         ],
       ),
-      floatingActionButton: const FloatingActionButton(
-        onPressed: null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'A',)));
+        },
         child: Icon(CupertinoIcons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -489,10 +524,20 @@ class _CommandePageState extends State<CommandePage> {
       setState(() { isLoading = false;});
     }
   }
+  
+  List<LigneCommande> getLigneCommandes(int cmdeId){
+    List<LigneCommande> ligneCommandes = [];
+    for(int i = 0; i < ligneCommandesAll.length; i++){
+      if(ligneCommandesAll[i].commande_id == cmdeId){
+        ligneCommandes.add(ligneCommandesAll[i]);
+      }
+    }
+    return ligneCommandes;
+  }
 
   Future<void> getCommandesList() async {
 
-    String token = Globals.token!;
+    String token = CnxInfo.token!;
     String bearerToken = 'Bearer $token';
 
     var myHeaders = {
@@ -503,7 +548,7 @@ class _CommandePageState extends State<CommandePage> {
 
     loadingProgress(true);
     final response = await http.get(
-      Uri.parse(commandeRoot),
+      Uri.parse(r_commande),
       headers: myHeaders,
     );
     loadingProgress(false);
@@ -511,14 +556,99 @@ class _CommandePageState extends State<CommandePage> {
     if(response.statusCode == 200) {
 
       final responseBody = jsonDecode(response.body);
-      commandes.clear();
+      commandesAll.clear();
+      ligneCommandesAll.clear();
 
-      for(int i = 0; i < responseBody['data']['commandes'].length; i++) {
+      late Commande commande;
+      late LigneCommande ligneCommande;
+      //print("NOMBRES COMMANDES ${responseBody['data']['commandes'].length}");
 
+      for(int i = 0; i < responseBody['data']['commandes'].length; i++) { // Get all commandes
+
+        commande = Commande.fromJson(responseBody['data']['commandes'][i]);
+        commandesAll.add(commande);
+        for(int j = 0; j < responseBody['data']['commandes'][i]['ligne_commandes'].length; j++){ // Get all ligne commandes
+          ligneCommande = LigneCommande.fromJson(responseBody['data']['commandes'][i]['ligne_commandes'][j]);
+          ligneCommandesAll.add(ligneCommande);
+        }
       }
-
     }
+  }
 
+  // Get all the products and all the categories
+  Future<void> getAllProductsAndCategories() async {
+    String token = CnxInfo.token!;
+    String bearerToken = 'Bearer $token';
+
+    var myHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': bearerToken
+    };
+
+    final response = await http.get(
+      Uri.parse(r_product),
+      headers: myHeaders,
+    );
+
+    if (response.statusCode == 200) {
+
+      final responseBody = jsonDecode(response.body);
+      late CategorieVetement categorieVetement;
+      late Product product;
+
+      allCategories.clear();
+      allProducts.clear();
+
+      for(int i = 0; i < responseBody['data']['categorie_vetements'].length; i++){
+        categorieVetement = CategorieVetement.fromJson(responseBody['data']['categorie_vetements'][i]);
+        allCategories.add(categorieVetement);
+
+        for(int j = 0; j < responseBody['data']['categorie_vetements'][i]['catalogues'].length; j++){
+          product = Product.fromJson(responseBody['data']['categorie_vetements'][i]['catalogues'][j]);
+          allProducts.add(product);
+        }
+      }
+      isProductOk = true;
+    } else {
+      isProductOk = false;
+      Fluttertoast.showToast(msg: 'Chargement de données non effectué correctement!');
+    }
+  }
+
+  // Get all client list
+  Future<void> getAllClient() async {
+    String token = CnxInfo.token!;
+    String bearerToken = 'Bearer $token';
+
+    var myHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': bearerToken
+    };
+
+    final response = await http.get(
+      Uri.parse(r_client),
+      headers: myHeaders,
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      allClients.clear();
+      late Client client;
+
+      for(int i = 0; i < responseBody['data']['clients'].length; i++){
+        client = Client.fromJson(responseBody['data']['clients'][i]);
+        allClients.add(client);
+      }
+      isClientOk = true;
+      // Handle the response
+    } else {
+      isClientOk = false;
+      Fluttertoast.showToast(msg: 'Chargement de données non effectué correctement!');
+    }
   }
 
 }
+
+//commandes = (responseBody as List).map((data) => Commande.fromJson(data)).toList();

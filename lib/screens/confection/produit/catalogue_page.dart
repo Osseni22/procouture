@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:procouture/models/Produit.dart';
 import 'package:procouture/screens/confection/produit/product_view_page.dart';
-import 'package:procouture/screens/confection/produit/produit_save_page.dart';
+import 'package:procouture/screens/confection/produit/product_save_page.dart';
 import 'package:procouture/utils/constants/color_constants.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_box_shadow.dart';
@@ -25,7 +25,7 @@ class CataloguePage extends StatefulWidget {
 
 class _CataloguePageState extends State<CataloguePage> {
 
-  List<String> familles = ['Toutes','Chemise','Pantalon','Robe','Veste','Tunique'];
+  //List<String> familles = ['Toutes','Chemise','Pantalon','Robe','Veste','Tunique'];
   int selectedIndex = 0;
   bool isLoading = false;
 
@@ -219,6 +219,8 @@ class _CataloguePageState extends State<CataloguePage> {
     );
   }
 
+
+  /// TRAITEMENTS
   void loadingProgress(bool value){
     if(value){
       setState(() { isLoading = true;});
@@ -228,7 +230,7 @@ class _CataloguePageState extends State<CataloguePage> {
   }
 
   Future<void> getProductsList(bool includeCategorieVetement) async {
-    String token = Globals.token!;
+    String token = CnxInfo.token!;
     String bearerToken = 'Bearer $token';
 
     var myHeaders = {
@@ -239,7 +241,7 @@ class _CataloguePageState extends State<CataloguePage> {
 
     loadingProgress(true);
     final response = await http.get(
-      Uri.parse(productRoot),
+      Uri.parse(r_product),
       headers: myHeaders,
     );
     loadingProgress(false);

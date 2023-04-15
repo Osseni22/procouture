@@ -15,6 +15,7 @@ import 'package:procouture/utils/globals/global_var.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:http/http.dart' as http;
 import 'package:procouture/services/api_routes/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/test_drop_downsearch.dart';
 import '../../utils/constants/color_constants.dart';
@@ -64,6 +65,9 @@ class _LoginState extends State<Login>
     );
 
     _controller.forward();
+
+    /// Get the last entered user informations
+    getUserInfo();
 
     super.initState();
   }
@@ -156,12 +160,12 @@ class _LoginState extends State<Login>
                                   );
                                   return;
                                 }
-                                login(emailCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', Globals.deviceName!);
-                               /* startLoading();
-                                await Future.delayed(Duration(seconds: 1));
-                                endLoading();
-                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
-                                */
+
+                                saveUserInfo();
+
+                                //login(emailCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
+                                loginAdmin(emailCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
+
                               },
                               child: Container(
                                 height: size.width / 8,
@@ -343,13 +347,13 @@ class _LoginState extends State<Login>
     //print(data.toString());
     startLoading();
     final response = await http.post(
-        Uri.parse(loginRoot),
+        Uri.parse(r_login),
         body: data,
         encoding: Encoding.getByName("utf-8")
     );
     endLoading();
     //print(jsonDecode(response.body));
-    print(response.statusCode);
+    //print(response.statusCode);
 
     if (response.statusCode == 200){
 
@@ -360,19 +364,14 @@ class _LoginState extends State<Login>
       final jsonMap = jsonDecoder.convert(response.body);
 
       // Extract data from the nested JSON object
-      Globals.userID = jsonMap['user']['id'];
-      Globals.userEmail = jsonMap['user']['email'];
-      Globals.userFirstName = jsonMap['user']['prenom'];
-      Globals.userLastName = jsonMap['user']['nom'];
-      Globals.atelierID = jsonMap['user']['atelier_id'];
-      Globals.token = jsonMap['token'];
+      CnxInfo.userID = jsonMap['user']['id'];
+      CnxInfo.userEmail = jsonMap['user']['email'];
+      CnxInfo.userFirstName = jsonMap['user']['prenom'];
+      CnxInfo.userLastName = jsonMap['user']['nom'];
+      CnxInfo.atelierID = jsonMap['user']['atelier_id'];
+      CnxInfo.token = jsonMap['token'];
 
-      print(Globals.userID);
-      print(Globals.userEmail);
-      print(Globals.userFirstName);
-      print(Globals.userLastName);
-      print(Globals.atelierID);
-      print(Globals.token);
+      print(CnxInfo.token);
 
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
     } else if (response.statusCode == 422){
@@ -381,7 +380,75 @@ class _LoginState extends State<Login>
       Fluttertoast.showToast(msg: "Connexion au serveur echouée !");
     }
   }
+
+  Future<void> loginAdmin(String email, String password, String role, String deviceName) async {
+    Map data = {
+      'email': email,
+      'password': password,
+      'role': role,
+      'device_name': deviceName
+    };
+    startLoading();
+    final response = await http.post(
+        Uri.parse(r_loginAdmin),
+        body: data,
+        encoding: Encoding.getByName("utf-8")
+    );
+    endLoading();
+
+    if (response.statusCode == 200){
+
+      // Create a JSON decoder object
+      final jsonDecoder = JsonDecoder();
+
+      // Decode the JSON data into a Map<String, dynamic> object
+      final jsonMap = jsonDecoder.convert(response.body);
+
+      // Extract data from the nested JSON object
+      CnxInfo.userID = jsonMap['user']['id'];
+      CnxInfo.userEmail = jsonMap['user']['email'];
+      CnxInfo.userFirstName = jsonMap['user']['prenom'];
+      CnxInfo.userLastName = jsonMap['user']['nom'];
+      CnxInfo.atelierID = jsonMap['user']['atelier_id'];
+      CnxInfo.token = jsonMap['token'];
+      print(CnxInfo.token);
+
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AtelierPage(token: CnxInfo.token!)));
+    } else if (response.statusCode == 422){
+      Fluttertoast.showToast(msg: "email ou mot de passe incorrect !");
+    } else {
+      Fluttertoast.showToast(msg: "Connexion au serveur echouée !");
+    }
+  }
+
+  // Last userInfo
+  void getUserInfo() async {
+    // get an instance of SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // get the login information using the keys that you used to save them
+    String? email = prefs.getString('email');
+    String? password = prefs.getString('password');
+    // Put informations in their respective TextField
+    if(email != null){
+      emailCtrl.text = email;
+    }
+    if(password != null){
+      passWordCtrl.text = password;
+    }
+  }
+  // Save user info
+  void saveUserInfo() async {
+    if(emailCtrl.text.isNotEmpty && passWordCtrl.text.isNotEmpty){
+      // get an instance of SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // save the login information using the SharedPreferences instance
+      await prefs.setString('email', emailCtrl.text);
+      await prefs.setString('password', passWordCtrl.text);
+    }
+  }
 }
+
+
 
 class MyBehavior extends ScrollBehavior {
   @override
@@ -393,3 +460,9 @@ class MyBehavior extends ScrollBehavior {
     return child;
   }
 }
+
+/* startLoading();
+    await Future.delayed(Duration(seconds: 1));
+    endLoading();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+ */

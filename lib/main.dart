@@ -25,13 +25,13 @@ void main() async {
   if(Platform.isAndroid) {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    Globals.deviceName = androidInfo.model;
+    CnxInfo.deviceName = androidInfo.model;
   } else if(Platform.isIOS){
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    Globals.deviceName = iosInfo.utsname.machine!;
+    CnxInfo.deviceName = iosInfo.utsname.machine!;
   } else {
-    Globals.deviceName = 'unknown';
+    CnxInfo.deviceName = 'unknown';
   }
 
   // Forcer le mode Portrait au lancement

@@ -37,7 +37,7 @@ class BoutiquePage extends StatelessWidget {
                         decoration: BoxDecoration(
                           image: const DecorationImage(
                               fit: BoxFit.contain,
-                              image: AssetImage('assets/images/yellow-shopping-bag.png')
+                              image: AssetImage('assets/images/shopping-bag2.gif')
                           ),
                         )
                     )

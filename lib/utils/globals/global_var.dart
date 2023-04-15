@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/custom_text.dart';
 
 
-class Globals{
+class CnxInfo{
   static String? deviceName;
   static int? userID;
   static String? userLastName;
@@ -11,6 +11,21 @@ class Globals{
   static String? userEmail;
   static int? atelierID;
   static String? token;
+}
+
+class Globals{
+  /// Global variables
+  static int modeleSource = 0;
+
+  /// Global functions
+  // Convert a french date to an english date
+  static String? convertDateFrToEn(String dateValue){
+    return ('${dateValue.substring(6,10)}-${dateValue.substring(3,5)}-${dateValue.substring(0,2)}');
+  }
+  // Convert a french date to an english date
+  static String? convertDateEnToFr(String dateValue){
+    return ('${dateValue.substring(8,10)}/${dateValue.substring(5,7)}/${dateValue.substring(0,4)}');
+  }
 }
 
 void infoSnackBar(String text, BuildContext context, {bool closeButton = false}){

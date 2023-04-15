@@ -252,7 +252,7 @@ class _ClientSaveState extends State<ClientSave> {
   Future<void> createClient2(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
-    String bearerToken = 'Bearer ${Globals.token!}';
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
     Map<String, String> data = {
       "nom": nom,
       "adresse": adresse,
@@ -267,7 +267,7 @@ class _ClientSaveState extends State<ClientSave> {
       'Authorization': bearerToken,
     };
 
-    var request = http.MultipartRequest('POST', Uri.parse(clientRoot));
+    var request = http.MultipartRequest('POST', Uri.parse(r_client));
     request.fields.addAll(data);
     request.headers.addAll(headers);
 
@@ -297,7 +297,7 @@ class _ClientSaveState extends State<ClientSave> {
 
     sendingProgress(true);
     final response = await http.post(
-        Uri.parse(clientRoot),
+        Uri.parse(r_client),
         body: json.encode(data),
         headers: {'Content-Type': 'application/json'}
     );
@@ -326,7 +326,7 @@ class _ClientSaveState extends State<ClientSave> {
 
     sendingProgress(true);
     final response = await http.put(
-        Uri.parse('$clientRoot/${widget.map!['id'].toString()}'),
+        Uri.parse('$r_client/${widget.map!['id'].toString()}'),
         body: jsonEncode(data),
         headers: {'Content-type': 'application/json'}
     );
@@ -343,7 +343,7 @@ class _ClientSaveState extends State<ClientSave> {
   Future<void> updateClient2(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
-    String bearerToken = 'Bearer ${Globals.token!}';
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
 
     Map<String, String> data = {
       "nom": nom,
@@ -361,7 +361,7 @@ class _ClientSaveState extends State<ClientSave> {
     };
 
     final response = await http.put(
-      Uri.parse('$clientRoot/${widget.map!['id'].toString()}'),
+      Uri.parse('$r_client/${widget.map!['id'].toString()}'),
       headers: headers,
       body: jsonEncode(data),
     );

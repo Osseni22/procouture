@@ -223,7 +223,7 @@ class _ClientPageState extends State<ClientPage> {
   }
 
   Future<void> getClientList() async {
-      String token = Globals.token!;
+      String token = CnxInfo.token!;
       String bearerToken = 'Bearer $token';
 
       var myHeaders = {
@@ -234,7 +234,7 @@ class _ClientPageState extends State<ClientPage> {
 
       startLoading();
       final response = await http.get(
-        Uri.parse(clientRoot),
+        Uri.parse(r_client),
         headers: myHeaders,
       );
       endLoading();

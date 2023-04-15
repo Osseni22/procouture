@@ -4,11 +4,19 @@ class User {
   String? nom;
   String? prenom;
   String? email;
-  String? token;
+  String? username;
+  String? password;
   int? atelier_id;
 
   // Constructor
-  User({required this.id, required this.nom, required this.prenom, required this.email, required this.token, required this.atelier_id});
+  User({required this.id,
+    required this.nom,
+    required this.prenom,
+    required this.email,
+    required this.atelier_id,
+    required this.password,
+    required this.username
+  });
 
   // Get instance data from a json data
   factory User.fromJson(Map<String, dynamic> json){
@@ -17,8 +25,9 @@ class User {
       nom: json['nom'],
       prenom: json['prenom'],
       email: json['email'],
+      username: json['username'],
+      password: json['password'],
       atelier_id: json['atelier_id'],
-      token: json['token'],
     );
   }
 
@@ -30,7 +39,8 @@ class User {
       'prenom': prenom,
       'email': email,
       'atelier_id': atelier_id,
-      'token': token,
+      'username': username,
+      'password': password,
     };
   }
 
