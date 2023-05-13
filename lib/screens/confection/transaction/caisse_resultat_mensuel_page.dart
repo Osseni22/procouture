@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:procouture/widgets/custom_text.dart';
-import 'package:procouture/screens/confection/caisse/etat_caisse_page.dart';
+import 'package:procouture/screens/confection/transaction/etat_caisse_page.dart';
 
 import '../../../widgets/default_app_bar.dart';
 import '../../../widgets/default_box_shadow.dart';

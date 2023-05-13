@@ -8,7 +8,7 @@ import 'package:procouture/screens/confection/commande/commande_page.dart';
 import 'package:procouture/screens/confection/employe/employes_page.dart';
 import 'package:procouture/screens/confection/fournisseur/fournisseur_page.dart';
 
-import '../screens/confection/caisse/caisse_menu_page.dart';
+import '../screens/confection/transaction/caisse_menu_page.dart';
 import '../screens/confection/produit/catalogue_page.dart';
 import '../widgets/custom_text.dart';
 

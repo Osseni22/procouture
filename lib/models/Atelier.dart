@@ -70,7 +70,7 @@ class Atelier {
     };
   }
 }
-/// Manage
+/// Manage Currency
 class Monnaie {
   int? id;
   String? libelle;

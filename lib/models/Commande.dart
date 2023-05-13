@@ -25,8 +25,8 @@ class Commande {
 
   // Constructor
   Commande({
-    required this.id,
-    required this.ref,
+    this.id,
+    this.ref,
     required this.date_commande,
     required this.montant_recu,
     required this.montant_ht,
@@ -36,12 +36,12 @@ class Commande {
     required this.date_livraison,
     required this.date_essaie,
     required this.client,
-    required this.email,
-    required this.etat,
+    this.email,
+    this.etat,
     required this.tva_id,
-    required this.etat_id,
-    required this.etat_solde_id,
-    required this.etat_retrait_id,
+    this.etat_id,
+    this.etat_solde_id,
+    this.etat_retrait_id,
     required this.client_id,
     required this.user_id,
     this.ligne_commandes,

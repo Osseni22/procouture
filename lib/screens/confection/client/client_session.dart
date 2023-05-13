@@ -155,7 +155,8 @@ class _SessionPageState extends State<SessionPage> {
                                     textWorkSans(ville.toUpperCase(), 14, Colors.white, TextAlign.left)
                                   ],
                                 ),
-                              )                          ),
+                              )
+                          ),
                         ),
                       ]
                   ),

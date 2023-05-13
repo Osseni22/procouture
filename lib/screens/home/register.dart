@@ -170,7 +170,8 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
-  /*Widget buildStep1(){
 
-  }*/
+  Future<void> registerInfos() async {
+
+  }
 }

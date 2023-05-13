@@ -12,8 +12,8 @@ import '../../services/api_routes/routes.dart';
 import '../../utils/globals/global_var.dart';
 
 class UserSave extends StatefulWidget {
-  final String pageMode; final int atelier_id;
-  UserSave({Key? key, required this.pageMode, required this.atelier_id}) : super(key: key);
+  final String pageMode; final int atelier_id; final User? user;
+  UserSave({Key? key, required this.pageMode, required this.atelier_id, this.user}) : super(key: key);
 
   @override
   State<UserSave> createState() => _UserSaveState();
@@ -32,7 +32,14 @@ class _UserSaveState extends State<UserSave> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    if(widget.pageMode == 'M'){
+      nomCtrl.text = widget.user!.nom!;
+      userNameCtrl.text = widget.user!.username!;
+      widget.user!.password != null ? motDePasseCtrl.text = widget.user!.password! : motDePasseCtrl.text = '';
+      widget.user!.password != null ? motDePasseCtrl2.text = widget.user!.password! : motDePasseCtrl2.text = '';
+      widget.user!.email != null ? emailCtrl.text = widget.user!.email! : emailCtrl.text = '';
+      widget.user!.prenom != null ? prenomCtrl.text = widget.user!.prenom! : prenomCtrl.text = '';
+    }
     super.initState();
   }
 
@@ -167,19 +174,21 @@ class _UserSaveState extends State<UserSave> {
                 ),
                 SizedBox(height: 25,),
                 GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     if(allOK()){
+                      User user = User(
+                          id: 0,
+                          nom: nomCtrl.text,
+                          prenom: prenomCtrl.text,
+                          email: emailCtrl.text,
+                          username: userNameCtrl.text,
+                          atelier_id: widget.atelier_id,
+                          password: motDePasseCtrl.text
+                      );
                       if(widget.pageMode == 'A'){
-                        User user = User(
-                            id: 0,
-                            nom: nomCtrl.text,
-                            prenom: prenomCtrl.text,
-                            email: emailCtrl.text,
-                            username: userNameCtrl.text,
-                            atelier_id: widget.atelier_id,
-                            password: motDePasseCtrl.text
-                        );
                         createUser(user);
+                      } else {
+                        updateUser(user);
                       }
                     }
                   },
@@ -202,7 +211,7 @@ class _UserSaveState extends State<UserSave> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        textMontserrat('Valider', 18, Colors.white, TextAlign.center),
+                        textMontserrat(widget.pageMode == 'A'? 'Valider':'Modifier', 18, Colors.white, TextAlign.center),
                         isSaving? const SizedBox(width: 10,) : const SizedBox(),
                         isSaving? const SizedBox(
                           height: 20,
@@ -272,6 +281,34 @@ class _UserSaveState extends State<UserSave> {
 
     if (response.statusCode == 201) {
       Fluttertoast.showToast(msg: 'Utilisateur enregistré avec succès !');
+      Navigator.pop(context);
+    } else {
+      Fluttertoast.showToast(msg: '${response.statusCode} Utilisateur pas enregistré !');
+      final responseBody = jsonDecode(response.body);
+      print(responseBody);
+    }
+  }
+
+  Future<void> updateUser(User user) async {
+
+    Map<String, dynamic> data = user.toJson();
+    data['_method'] = 'PUT';
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
+
+    savingIndicator(true);
+    final response = await http.post(
+        Uri.parse('$r_ateliers/${widget.atelier_id}/users/${widget.user!.id}'),
+        body: json.encode(data),
+        headers: {
+          'Accept':'application/json',
+          'Content-Type':'application/json',
+          'Authorization': bearerToken,
+        }
+    );
+    savingIndicator(false);
+
+    if (response.statusCode == 201) {
+      Fluttertoast.showToast(msg: 'Modifications effectuées avec succès !');
       Navigator.pop(context);
     } else {
       Fluttertoast.showToast(msg: '${response.statusCode} Utilisateur pas enregistré !');

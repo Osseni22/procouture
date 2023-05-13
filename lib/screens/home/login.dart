@@ -11,12 +11,15 @@ import 'package:procouture/screens/home/atelier_page.dart';
 import 'package:procouture/screens/home/home.dart';
 import 'package:procouture/components/login_page_components.dart';
 import 'package:procouture/screens/home/register.dart';
+import 'package:procouture/screens/home/register2.dart';
 import 'package:procouture/utils/globals/global_var.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:http/http.dart' as http;
 import 'package:procouture/services/api_routes/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:procouture/screens/home/confidential.dart';
 
+import '../../components/message_box.dart';
 import '../../components/test_drop_downsearch.dart';
 import '../../utils/constants/color_constants.dart';
 
@@ -32,14 +35,15 @@ class _LoginState extends State<Login>
   late AnimationController _controller;
   late Animation<double> _opacity;
   late Animation<double> _transform;
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  TextEditingController emailCtrl = TextEditingController();
+  TextEditingController emailUsernameCtrl = TextEditingController();
   TextEditingController passWordCtrl = TextEditingController();
 
   bool isChecked = false;
   bool isConnecting = false;
-
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isAdmin = false;
+  bool isPassword = true;
 
   @override
   void initState() {
@@ -138,8 +142,8 @@ class _LoginState extends State<Login>
                           ),
                         ),
                         SizedBox(),
-                        component1(emailCtrl,Icons.mail_rounded, 'E-mail', false, false),
-                        component1(passWordCtrl,Icons.lock_outline, 'Mot de passe', true, false),
+                        component1(emailUsernameCtrl,isAdmin? Icons.mail_rounded: Icons.person, isAdmin? 'E-mail':"Nom d'utilisateur", false,false),
+                        component1(passWordCtrl,Icons.lock_outline, 'Mot de passe', true,true),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -151,7 +155,7 @@ class _LoginState extends State<Login>
                             ),*/
                             GestureDetector(
                               onTap: () async {
-                                if(emailCtrl.text.isEmpty || passWordCtrl.text.isEmpty){
+                                if(emailUsernameCtrl.text.isEmpty || passWordCtrl.text.isEmpty){
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: textLato('Veuillez renseigner les deux champs !', 12, Colors.white, TextAlign.start),
@@ -163,8 +167,12 @@ class _LoginState extends State<Login>
 
                                 saveUserInfo();
 
-                                //login(emailCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
-                                loginAdmin(emailCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
+                                if(isAdmin){
+                                  loginAdmin(emailUsernameCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
+                                } else {
+                                  login(emailUsernameCtrl.text.toString(), passWordCtrl.text.toString(), 'mobile', CnxInfo.deviceName!);
+                                }
+
 
                               },
                               child: Container(
@@ -210,17 +218,17 @@ class _LoginState extends State<Login>
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Checkbox(
-                                    value: isChecked,
+                                    value: isAdmin,
                                     activeColor: Colors.white,
                                     checkColor: kProcouture_green,
                                     onChanged: (bool? value){
                                       setState(() {
-                                        isChecked = value!;
+                                        isAdmin = value!;
                                       });
 
                                     },
                                   ),
-                                  textOpenSans('Rester connecté',13,Colors.black,TextAlign.left),
+                                  textOpenSans('Administrateur',13,Colors.black,TextAlign.left),
                                 ],
                               ),
                             )
@@ -236,9 +244,7 @@ class _LoginState extends State<Login>
                                   text: 'la politique de confidentialité',
                                   style: TextStyle(color: Colors.green, fontSize: 12,fontFamily: 'Raleway'),
                                   recognizer: TapGestureRecognizer()..onTap = () {
-                                    Fluttertoast.showToast(
-                                      msg: 'En cours d\'édition',
-                                    );
+                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Confidentials()));
                                   },
                                 ),
                               ),
@@ -246,10 +252,22 @@ class _LoginState extends State<Login>
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const Register()));
-                              //Navigator.push(context, MaterialPageRoute(builder: (_) => const TestDropDownSearch()));
-                            },
+                          onTap: () async {
+                            Globals.isOK = false;
+                            await Navigator.push(context, MaterialPageRoute(builder: (_) => const Register2()));
+
+                            if(Globals.isOK){
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (ctx) => bottomSheet(),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(17.0),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                           child: Container(
                             alignment: Alignment.center,
                             height: 50,
@@ -273,13 +291,14 @@ class _LoginState extends State<Login>
     );
   }
 
-  Widget component1(TextEditingController myController, IconData icon, String hintText, bool isPassword, bool isEmail) {
+  Widget component1(TextEditingController myController, IconData icon, String hintText,bool isPwField ,bool visibleString/* bool isEmail*/) {
     Size size = MediaQuery.of(context).size;
+    bool isPw = isPassword;
     return Container(
       height: 50,
       width: size.width / 1.22,
       alignment: Alignment.center,
-      padding: EdgeInsets.only(right: size.width / 30),
+      padding: EdgeInsets.only(right: size.width / 70),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(.05),
         borderRadius: BorderRadius.circular(12),
@@ -287,13 +306,19 @@ class _LoginState extends State<Login>
       child: TextField(
         controller: myController,
         style: TextStyle(color: Colors.black.withOpacity(.8), fontFamily: 'OpenSans'),
-        obscureText: isPassword,
-        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+        obscureText: isPwField? isPassword : false,
+        keyboardType: isAdmin ? TextInputType.emailAddress : TextInputType.text,
         decoration: InputDecoration(
           prefixIcon: Icon(
             icon,
             color: Colors.black.withOpacity(.7),
           ),
+          suffixIcon: visibleString ? IconButton(
+            onPressed: (){
+              setState(() { isPassword = !isPassword; });
+            },
+            icon: isPassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
+          ) : null,
           border: InputBorder.none,
           hintMaxLines: 1,
           hintText: hintText,
@@ -337,9 +362,9 @@ class _LoginState extends State<Login>
     });
   }
 
-  void login (String email, String password, String role, String deviceName) async {
+  Future<void> login (String username, String password, String role, String deviceName) async {
     Map data = {
-      'email': email,
+      'username': username,
       'password': password,
       'role': role,
       'device_name': deviceName
@@ -352,16 +377,13 @@ class _LoginState extends State<Login>
         encoding: Encoding.getByName("utf-8")
     );
     endLoading();
-    //print(jsonDecode(response.body));
-    //print(response.statusCode);
+
+    // Create a JSON decoder object
+    final jsonDecoder = JsonDecoder();
+    // Decode the JSON data into a Map<String, dynamic> object
+    final jsonMap = jsonDecoder.convert(response.body);
 
     if (response.statusCode == 200){
-
-      // Create a JSON decoder object
-      final jsonDecoder = JsonDecoder();
-
-      // Decode the JSON data into a Map<String, dynamic> object
-      final jsonMap = jsonDecoder.convert(response.body);
 
       // Extract data from the nested JSON object
       CnxInfo.userID = jsonMap['user']['id'];
@@ -370,14 +392,18 @@ class _LoginState extends State<Login>
       CnxInfo.userLastName = jsonMap['user']['nom'];
       CnxInfo.atelierID = jsonMap['user']['atelier_id'];
       CnxInfo.token = jsonMap['token'];
+      CnxInfo.symboleMonnaie = jsonMap['user']['atelier']['monnaie']['symbole'];
+      CnxInfo.atelierLibelle = jsonMap['user']['atelier']['libelle'];
 
+      print(CnxInfo.symboleMonnaie);
+      print(CnxInfo.atelierLibelle);
       print(CnxInfo.token);
 
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
     } else if (response.statusCode == 422){
-      Fluttertoast.showToast(msg: "email ou mot de passe incorrect !");
+      Fluttertoast.showToast(msg: '${jsonMap['messages']}');
     } else {
-      Fluttertoast.showToast(msg: "Connexion au serveur echouée !");
+      Fluttertoast.showToast(msg: '${jsonMap['messages']}');
     }
   }
 
@@ -396,13 +422,12 @@ class _LoginState extends State<Login>
     );
     endLoading();
 
+    // Create a JSON decoder object
+    final jsonDecoder = JsonDecoder();
+    // Decode the JSON data into a Map<String, dynamic> object
+    final jsonMap = jsonDecoder.convert(response.body);
+
     if (response.statusCode == 200){
-
-      // Create a JSON decoder object
-      final jsonDecoder = JsonDecoder();
-
-      // Decode the JSON data into a Map<String, dynamic> object
-      final jsonMap = jsonDecoder.convert(response.body);
 
       // Extract data from the nested JSON object
       CnxInfo.userID = jsonMap['user']['id'];
@@ -413,11 +438,11 @@ class _LoginState extends State<Login>
       CnxInfo.token = jsonMap['token'];
       print(CnxInfo.token);
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AtelierPage(token: CnxInfo.token!)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => AtelierPage(token: CnxInfo.token!)));
     } else if (response.statusCode == 422){
-      Fluttertoast.showToast(msg: "email ou mot de passe incorrect !");
+      Fluttertoast.showToast(msg: '${jsonMap['messages']}');
     } else {
-      Fluttertoast.showToast(msg: "Connexion au serveur echouée !");
+      Fluttertoast.showToast(msg: '${jsonMap['messages']}');
     }
   }
 
@@ -430,7 +455,25 @@ class _LoginState extends State<Login>
     String? password = prefs.getString('password');
     // Put informations in their respective TextField
     if(email != null){
-      emailCtrl.text = email;
+      emailUsernameCtrl.text = email;
+    }
+    if(password != null){
+      passWordCtrl.text = password;
+    }
+  }
+  void getAdminInfo() async {
+    // get an instance of SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // get the login information using the keys that you used to save them
+    bool? value = prefs.getBool('isAdmin');
+    String? email = prefs.getString('email');
+    String? password = prefs.getString('password');
+    // Put informations in their respective TextField
+    if(value != null && value == true){
+      isAdmin = value;
+    }
+    if(email != null){
+      emailUsernameCtrl.text = email;
     }
     if(password != null){
       passWordCtrl.text = password;
@@ -438,13 +481,60 @@ class _LoginState extends State<Login>
   }
   // Save user info
   void saveUserInfo() async {
-    if(emailCtrl.text.isNotEmpty && passWordCtrl.text.isNotEmpty){
+    if(emailUsernameCtrl.text.isNotEmpty && passWordCtrl.text.isNotEmpty){
       // get an instance of SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       // save the login information using the SharedPreferences instance
-      await prefs.setString('email', emailCtrl.text);
+      await prefs.setBool('isAdmin', isAdmin);
+      await prefs.setString('email', emailUsernameCtrl.text);
       await prefs.setString('password', passWordCtrl.text);
     }
+  }
+  /*void saveAdminInfo() async {
+    if(emailUsernameCtrl.text.isNotEmpty && passWordCtrl.text.isNotEmpty){
+      // get an instance of SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // save the login information using the SharedPreferences instance
+      await prefs.setBool('isAdmin', isAdmin);
+      await prefs.setString('email', emailUsernameCtrl.text);
+      await prefs.setString('password', passWordCtrl.text);
+    }
+  }*/
+  Container bottomSheet(){
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+      height: 200,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            height: 30,
+            child: textMontserrat('Votre compte a été créé', 17, Colors.black, TextAlign.center, fontWeight: FontWeight.w600),
+          ),
+          Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                child: textMontserrat("Veuillez confirmer l'Email que nous venons de vous envoyer, ensuite veuillez vous connecter en tant qu'Administrateur du compte pour la configuration.", 14, Colors.black, TextAlign.center),
+              )
+          ),
+          GestureDetector(
+            onTap: (){
+              Navigator.pop(scaffoldKey.currentState!.context);
+            },
+            child: Container(
+              height: 45,
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(35),
+                  color: kProcouture_green
+              ),
+              child: textMontserrat("OK j'ai compris", 15, Colors.white, TextAlign.center),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -465,4 +555,7 @@ class MyBehavior extends ScrollBehavior {
     await Future.delayed(Duration(seconds: 1));
     endLoading();
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+
+    msgBoxOk('Création de Compte', 'Veuillez confirmer l\'email que nous venons de vous envoyer, et vous connecter en tant que d\'Admin', context))
+
  */

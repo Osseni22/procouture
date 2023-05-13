@@ -192,15 +192,19 @@ class _ClientSaveState extends State<ClientSave> {
                       return;
                     }*/
                     if(nomCtrl.text.isEmpty){
-                      Fluttertoast.showToast(msg: 'Renseigner au moins le nom du client');
+                      Fluttertoast.showToast(msg: 'Le nom du client est requis');
+                      return;
+                    }
+                    if(telephone1Ctrl.text.isEmpty){
+                      Fluttertoast.showToast(msg: 'Le N° de telephone 1 du client est requis');
                       return;
                     }
                     if (widget.pageMode == 'A') {
-                      createClient2(nomCtrl.text.toString(), adresseCtrl.text.toString(), villeCtrl.text.toString(),
+                      createClient(nomCtrl.text.toString(), adresseCtrl.text.toString(), villeCtrl.text.toString(),
                           telephone1Ctrl.text.toString(), telephone2Ctrl.text.toString(),
                           emailCtrl.text.toString());
                     } else {
-                      updateClient2(nomCtrl.text, adresseCtrl.text, villeCtrl.text,
+                      updateClient(nomCtrl.text, adresseCtrl.text, villeCtrl.text,
                           telephone1Ctrl.text, telephone2Ctrl.text,
                           emailCtrl.text);
                     }
@@ -249,7 +253,7 @@ class _ClientSaveState extends State<ClientSave> {
     );
   }
 
-  Future<void> createClient2(String nom, String adresse, String ville,
+  Future<void> createClient(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
     String bearerToken = 'Bearer ${CnxInfo.token!}';
@@ -279,68 +283,13 @@ class _ClientSaveState extends State<ClientSave> {
       Fluttertoast.showToast(msg: 'Client enregistré avec succès !');
       Navigator.pop(context);
     } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Client pas enregistré !');
+      Fluttertoast.showToast(msg: '(${response.statusCode}) Client pas enregistré !');
     }
   }
 
-  Future<void> createClient(String nom, String adresse, String ville,
-      String telephone1, String telephone2, String email) async {
 
-    Map<String, String> data = {
-      "nom": nom,
-      "adresse": adresse,
-      "ville": ville,
-      "telephone1": telephone1,
-      "telephone2": telephone2,
-      "email": email,
-    };
-
-    sendingProgress(true);
-    final response = await http.post(
-        Uri.parse(r_client),
-        body: json.encode(data),
-        headers: {'Content-Type': 'application/json'}
-    );
-    sendingProgress(false);
-    print(response.body);
-    if (response.statusCode == 201) {
-      Fluttertoast.showToast(msg: 'Client enregistré avec succès !');
-      Navigator.pop(context);
-    } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Client pas enregistré !');
-      final responseBody = jsonDecode(response.body);
-      print(responseBody);
-    }
-  }
 
   Future<void> updateClient(String nom, String adresse, String ville,
-      String telephone1, String telephone2, String email) async {
-    Map<String, dynamic> data = {
-      "nom": nom,
-      "adresse": adresse,
-      "ville": ville,
-      "telephone1": telephone1,
-      "telephone2": telephone2,
-      "email": email,
-    };
-
-    sendingProgress(true);
-    final response = await http.put(
-        Uri.parse('$r_client/${widget.map!['id'].toString()}'),
-        body: jsonEncode(data),
-        headers: {'Content-type': 'application/json'}
-    );
-    sendingProgress(false);
-
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: 'Client modifié avec succès !');
-      Navigator.pop(context);
-    } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Client pas enregistré !');
-    }
-  }
-
-  Future<void> updateClient2(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
     String bearerToken = 'Bearer ${CnxInfo.token!}';

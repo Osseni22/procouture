@@ -8,8 +8,8 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:procouture/widgets/default_box_shadow.dart';
 
-import '../caisse/depenses_commande_page.dart';
-import '../caisse/reglement_page.dart';
+import '../transaction/depenses_commande_page.dart';
+import '../transaction/reglement_page.dart';
 
 class ClientCommandePage extends StatefulWidget {
   const ClientCommandePage({Key? key}) : super(key: key);
@@ -292,7 +292,7 @@ class _ClientCommandePageState extends State<ClientCommandePage> {
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 3.0),
                                       child: GestureDetector(
-                                        onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (_) => ReglementPage()));},
+                                        onTap: (){ /*Navigator.push(context, MaterialPageRoute(builder: (_) => ReglementPage()));*/},
                                         child: Container(
                                           width: 120,
                                           height: 40,

@@ -27,7 +27,7 @@ Future<bool> msgBoxYesNo(String titleText, String contentText, BuildContext cont
             style: TextButton.styleFrom(
                 backgroundColor: Colors.grey.withOpacity(0.1)
             ),
-            onPressed: () => Navigator.of(context).pop(false), //<-- SEE HERE
+            onPressed: () => Navigator.of(context).pop(false),
             child: textMontserrat('Non',13,Colors.black,TextAlign.start, fontWeight: FontWeight.w600),
           ),
         ),
@@ -38,9 +38,8 @@ Future<bool> msgBoxYesNo(String titleText, String contentText, BuildContext cont
             style: TextButton.styleFrom(
               backgroundColor: Colors.green.withOpacity(0.2)
             ),
-            onPressed: () => Navigator.of(context).pop(true), // <-- SEE HERE
+            onPressed: () => Navigator.of(context).pop(true),
             child:textMontserrat('Oui',13,Colors.green.withOpacity(0.6),TextAlign.start, fontWeight: FontWeight.w800),
-
           ),
         ),
       ],
@@ -88,7 +87,7 @@ Future<bool> msgBoxLanguageChoiceSubmitCancel(BuildContext context) async {
       ),
       actions: <Widget>[
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false), //<-- SEE HERE
+          onPressed: () => Navigator.of(context).pop(false),
           child: Text('Annuler'),
         ),
         ElevatedButton(

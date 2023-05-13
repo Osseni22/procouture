@@ -117,37 +117,43 @@ class _AtelierUsersPageState extends State<AtelierUsersPage> {
                                     )
                                   ],
                                 ),
-                                child: Container(
-                                  height: 85,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 23,
-                                          backgroundColor: Colors.orange,
-                                          child: textLato(allAtelierUsers[index].nom!.substring(0,1).toUpperCase(), 22, Colors.black, TextAlign.center),
-                                        ),
-                                        const SizedBox(width: 20,),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              textLato(allAtelierUsers[index].nom!, 21, Colors.black, TextAlign.left),
-                                              const SizedBox(height: 2,),
-                                              textWorkSans(allAtelierUsers[index].username != null? allAtelierUsers[index].username! : '', 14, Colors.grey, TextAlign.left),
-                                              const SizedBox(height: 2,),
-                                              textWorkSans(allAtelierUsers[index].email != null ? allAtelierUsers[index].email!: '', 14, Colors.grey, TextAlign.left)
-                                            ],
+                                child: GestureDetector(
+                                  onTap: ()async {
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context)=> UserSave(pageMode: 'M',atelier_id: widget.atelier!.id!, user: allAtelierUsers[index],)));
+                                    getAllAtelierUsers();
+                                  },
+                                  child: Container(
+                                    height: 85,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 23,
+                                            backgroundColor: Colors.orange,
+                                            child: textLato(allAtelierUsers[index].nom!.substring(0,1).toUpperCase(), 22, Colors.black, TextAlign.center),
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(width: 20,),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                textLato(allAtelierUsers[index].nom!, 21, Colors.black, TextAlign.left),
+                                                const SizedBox(height: 2,),
+                                                textWorkSans(allAtelierUsers[index].username != null ? "Nom d'utilisateur : ${allAtelierUsers[index].username!}" : '', 14, Colors.grey, TextAlign.left),
+                                                const SizedBox(height: 2,),
+                                                textWorkSans(allAtelierUsers[index].email != null ? "E-mail : ${allAtelierUsers[index].email!}": '', 14, Colors.grey, TextAlign.left)
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -167,6 +173,7 @@ class _AtelierUsersPageState extends State<AtelierUsersPage> {
         backgroundColor: kProcouture_green,
         child: const Icon(Icons.add, color: Colors.white,),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -187,13 +194,11 @@ class _AtelierUsersPageState extends State<AtelierUsersPage> {
     );
     loadingProgress(false);
 
+    allAtelierUsers.clear();
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       late User user;
-
       for (int i = 0; i < responseBody['data']['users'].length; i++) { // Get all users
-        print('///////////');
-        print(responseBody['data']['users'][i]);
         user = User.fromJson(responseBody['data']['users'][i]);
         allAtelierUsers.add(user);
       }

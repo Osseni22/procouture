@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:procouture/screens/confection/caisse/depenses_commande_page.dart';
-import 'package:procouture/screens/confection/caisse/reglement_page.dart';
+import 'package:procouture/screens/confection/transaction/depenses_commande_page.dart';
+import 'package:procouture/screens/confection/transaction/reglement_page.dart';
 import 'package:procouture/screens/confection/commande/commande_save_page.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
@@ -16,8 +16,10 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:procouture/widgets/default_box_shadow.dart';
 
+import '../../../components/message_box.dart';
 import '../../../models/CategorieVetement.dart';
 import '../../../models/Commande.dart';
+import '../../../models/ConfigData.dart';
 import '../../../models/LigneCommande.dart';
 import '../../../models/Product.dart';
 import '../../../services/api_routes/routes.dart';
@@ -36,6 +38,9 @@ class _CommandePageState extends State<CommandePage> {
   TextEditingController dateTimeCtrl2 = TextEditingController();
   final format = DateFormat('dd/MM/yyyy');
 
+  bool showFilter = false;
+  bool isOK = false;
+
   List<String> itemsEtatCmde = [
     'En Attente',
     'Terminée',
@@ -46,10 +51,10 @@ class _CommandePageState extends State<CommandePage> {
   bool isLoading = false;
 
   // Get all the commandes in a list
-  List<Commande> commandesAll = [];
+  List<Commande> allCommandes = [];
 
   // Get all lignes commandes in a list
-  List<LigneCommande> ligneCommandesAll = [];
+  List<LigneCommande> allLigneCommandes = [];
 
   /// Load informations before going to save page
   // Get all client liste
@@ -65,7 +70,7 @@ class _CommandePageState extends State<CommandePage> {
   @override
   void initState() {
     getCommandesList();
-    print(ligneCommandesAll);
+    getAllCmdeElements();
     super.initState();
   }
 
@@ -73,159 +78,174 @@ class _CommandePageState extends State<CommandePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: myDefaultAppBar('Commandes', context),
-      body: Column(
+      appBar: myDefaultAppBar('Commandes', context, actions: [
+        IconButton(onPressed: (){
+          setState(() {
+            showFilter = !showFilter;
+          });
+        }, icon: !showFilter? Icon(Icons.filter_alt, color: Colors.black,) : Icon(Icons.filter_alt_off,color: Colors.black,))
+      ]),
+      body: isLoading? const LinearProgressIndicator(backgroundColor: Colors.transparent,) : Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          isLoading? const LinearProgressIndicator(backgroundColor: Colors.transparent,) : const SizedBox(),
+          //isLoading? const LinearProgressIndicator(backgroundColor: Colors.transparent,) : const SizedBox(),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              height: 120,
+            child: AnimatedContainer(
+              curve: Curves.easeInQuad,
+              duration: Duration(milliseconds: 500),
+              height: showFilter? 120 : 0,
               //color: Colors.blue,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(13),
+                boxShadow: [kDefaultBoxShadow]
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  /// INFORMATIONS DE FILTRAGE
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      height: 40,
-                      //color: Colors.blue,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Afficher la première date
-                          Container(
-                            alignment: Alignment.center,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
-                              //border: Border.all(color: Colors.grey.withOpacity(0.5))
-                            ),
-                            child: DateTimeField(
-                              resetIcon: null,
-                              style: TextStyle(fontFamily: 'OpenSans', fontWeight: FontWeight.w400),
-                              textAlign: TextAlign.center,
-                              format: format,
-                              controller: dateTimeCtrl,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Date début',
-                                  hintStyle: TextStyle(fontFamily: 'OpenSans', color: Colors.grey)
+              child: Container(
+                alignment: Alignment.center,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      /// INFORMATIONS DE FILTRAGE
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Container(
+                          height: 40,
+                          //color: Colors.blue,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Afficher la première date
+                              Container(
+                                alignment: Alignment.center,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                  //border: Border.all(color: Colors.grey.withOpacity(0.5))
+                                ),
+                                child: DateTimeField(
+                                  resetIcon: null,
+                                  style: TextStyle(fontFamily: 'OpenSans', fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                  format: format,
+                                  controller: dateTimeCtrl,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Date début',
+                                      hintStyle: TextStyle(fontFamily: 'OpenSans', color: Colors.grey)
+                                  ),
+                                  onShowPicker: (context, currentValue) async {
+                                    return await showDatePicker(
+                                      context: context,
+                                      firstDate: DateTime(2000),
+                                      initialDate: currentValue ?? DateTime.now(),
+                                      lastDate: DateTime(2100),
+                                    );
+                                  },
+                                ),
                               ),
-                              onShowPicker: (context, currentValue) async {
-                                return await showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(2000),
-                                  initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10,),
-                          // Afficher la deuxième date
-                          Container(
-                            alignment: Alignment.center,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
-                              //border: Border.all(color: Colors.grey.withOpacity(0.5))
-                            ),
-                            child: DateTimeField(
-                              resetIcon: null,
-                              style: TextStyle(fontFamily: 'OpenSans', fontWeight: FontWeight.w400),
-                              textAlign: TextAlign.center,
-                              format: format,
-                              controller: dateTimeCtrl2,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Date fin',
-                                  hintStyle: TextStyle(fontFamily: 'OpenSans', color: Colors.grey)
+                              const SizedBox(width: 10,),
+                              // Afficher la deuxième date
+                              Container(
+                                alignment: Alignment.center,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                  //border: Border.all(color: Colors.grey.withOpacity(0.5))
+                                ),
+                                child: DateTimeField(
+                                  resetIcon: null,
+                                  style: TextStyle(fontFamily: 'OpenSans', fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                  format: format,
+                                  controller: dateTimeCtrl2,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Date fin',
+                                      hintStyle: TextStyle(fontFamily: 'OpenSans', color: Colors.grey)
+                                  ),
+                                  onShowPicker: (context, currentValue) async {
+                                    return await showDatePicker(
+                                      context: context,
+                                      firstDate: DateTime(2000),
+                                      initialDate: currentValue ?? DateTime.now(),
+                                      lastDate: DateTime(2100),
+                                    );
+                                  },
+                                ),
                               ),
-                              onShowPicker: (context, currentValue) async {
-                                return await showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(2000),
-                                  initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                              },
-                            ),
+                              const SizedBox(width: 10,),
+
+                              // Afficher le bouton de recherche
+                              Container(alignment: Alignment.center,
+                                width: 70,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                  //border: Border.all(color: Colors.grey.withOpacity(0.5))
+                                ),
+                                child: IconButton(
+                                  onPressed: (){},
+                                  icon: Icon(CupertinoIcons.search, color: Colors.grey),
+                                ),
+                              )
+                            ],
                           ),
-                          const SizedBox(width: 10,),
+                        ),
+                      ),
 
-                          // Afficher le bouton de recherche
-                          Container(alignment: Alignment.center,
-                            width: 70,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(10),
-                              //border: Border.all(color: Colors.grey.withOpacity(0.5))
-                            ),
-                            child: IconButton(
-                              onPressed: (){},
-                              icon: Icon(CupertinoIcons.search, color: Colors.grey),
-                            ),
-                          )
-                        ],
+                      const SizedBox(height: 15),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Container(
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(10),
+                            //border: Border.all(color: Colors.grey.withOpacity(0.5))
+                          ),
+                          child: DropdownButton(
+                            isExpanded: true,
+                            underline: const SizedBox(),
+                            hint: textRaleway("Choisir l'état de la commande",16,Colors.grey,TextAlign.center),
+                            value: etatCmdeValue,
+                            icon: const Icon(Icons.arrow_drop_down_rounded),
+                            items: itemsEtatCmde.map((String itemsValue) {
+                              return DropdownMenuItem(
+                                value: itemsValue,
+                                child: Center(
+                                    child: textRaleway(itemsValue,16,Colors.black, TextAlign.center)
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                etatCmdeValue = newValue!;
+                              });
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      height: 40,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        //border: Border.all(color: Colors.grey.withOpacity(0.5))
-                      ),
-                      child: DropdownButton(
-                        isExpanded: true,
-                        underline: const SizedBox(),
-                        hint: textRaleway("Choisir l'état de la commande",16,Colors.grey,TextAlign.center),
-                        value: etatCmdeValue,
-                        icon: const Icon(Icons.arrow_drop_down_rounded),
-                        items: itemsEtatCmde.map((String itemsValue) {
-                          return DropdownMenuItem(
-                            value: itemsValue,
-                            child: Center(
-                                child: textRaleway(itemsValue,16,Colors.black, TextAlign.center)
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            etatCmdeValue = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
           /// AFFICHAGE DES COMMANDES
           const SizedBox(height: 15),
           Expanded(
-              child: Padding(
+              child: allCommandes.isNotEmpty?
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ListView.builder(
                   physics: const BouncingScrollPhysics(),
-                  itemCount: commandesAll.length,
+                  itemCount: allCommandes.length,
                   itemBuilder: (context, int index) => GestureDetector(
                     onTap: (){ print('OK'); },
                     child: Container(
@@ -255,19 +275,19 @@ class _CommandePageState extends State<CommandePage> {
                                           alignment: Alignment.centerLeft,
                                           child: Visibility(
                                             visible: true,
-                                            child: textRaleway(commandesAll[index].etat!, 12, Colors.red, TextAlign.center),
+                                            child: textRaleway(allCommandes[index].etat!, 12, Colors.red, TextAlign.center),
                                           ),
                                         ),
                                         Container(
                                           width: 160,
-                                          child:  textOpenSans("Cmde ${commandesAll[index].id}", 16, Colors.black, TextAlign.center),
+                                          child:  textOpenSans("Cmde ${allCommandes[index].id}", 16, Colors.black, TextAlign.center),
                                         ),
                                         Container(
                                           width: 80,
                                           alignment: AlignmentDirectional.centerEnd,
                                           child: Visibility(
                                             visible: true,
-                                            child: textWorkSans(commandesAll[index].ref!, 12, Colors.black26, TextAlign.right),
+                                            child: textWorkSans(allCommandes[index].ref!, 12, Colors.black26, TextAlign.right),
                                           ),
                                         ),
                                       ],
@@ -276,7 +296,7 @@ class _CommandePageState extends State<CommandePage> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        textOpenSans(commandesAll[index].client!.toUpperCase(), 16, Colors.green, TextAlign.center),
+                                        textOpenSans(allCommandes[index].client!.toUpperCase(), 16, Colors.green, TextAlign.center),
                                       ],
                                     ),
                                     // Afficher les dates
@@ -284,27 +304,27 @@ class _CommandePageState extends State<CommandePage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         textOpenSans('Date Cmde : ', 11, Colors.black, TextAlign.center),
-                                        textOpenSans(commandesAll[index].date_commande!, 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
+                                        textOpenSans("${Globals.convertDateEnToFr(allCommandes[index].date_commande!)}", 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
                                         textOpenSans('Date Livr. : ', 11, Colors.black, TextAlign.center),
-                                        textOpenSans(commandesAll[index].date_prev_livraison!, 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
+                                        textOpenSans("${Globals.convertDateEnToFr(allCommandes[index].date_prev_livraison!)}", 13, Colors.black45, TextAlign.center,fontWeight: FontWeight.bold),
                                       ],
                                     ),
                                     // Montant TTC
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant TTC : ', 13, Colors.black, TextAlign.center)),
+                                        Container(width: 120,alignment: Alignment.centerRight, child: textOpenSans('Montant TTC : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans(commandesAll[index].montant_ttc.toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans("${NumberFormat('#,###', 'fr_FR').format(allCommandes[index].montant_ttc)} ${CnxInfo.symboleMonnaie}", 15, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     // Montant Regle
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant réglé : ', 13, Colors.black, TextAlign.center)),
+                                        Container(width: 120,alignment: Alignment.centerRight, child: textOpenSans('Montant réglé : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans(commandesAll[index].montant_recu.toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100,alignment: Alignment.centerLeft, child: textOpenSans("${NumberFormat('#,###', 'fr_FR').format(allCommandes[index].montant_recu)} ${CnxInfo.symboleMonnaie}", 15, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     // Montant Restant
@@ -313,7 +333,7 @@ class _CommandePageState extends State<CommandePage> {
                                       children: [
                                         Container(width: 120,alignment: Alignment.centerRight,child: textOpenSans('Montant restant : ', 13, Colors.black, TextAlign.center)),
                                         const SizedBox(width: 4,),
-                                        Container(width: 100, alignment: Alignment.centerLeft, child: textOpenSans((commandesAll[index].montant_ttc! - commandesAll[index].montant_recu!).toString(), 14, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
+                                        Container(width: 100, alignment: Alignment.centerLeft, child: textOpenSans("${NumberFormat('#,###', 'fr_FR').format(allCommandes[index].montant_ttc! - allCommandes[index].montant_recu!)} ${CnxInfo.symboleMonnaie}", 15, Colors.black, TextAlign.center,fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ],
@@ -330,7 +350,11 @@ class _CommandePageState extends State<CommandePage> {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 3.0),
                                     child: GestureDetector(
-                                      onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (_) => ReglementPage()));},
+                                      onTap: () async {
+                                        await Navigator.push(context, MaterialPageRoute(builder: (_) => ReglementPage(commande : allCommandes[index])));
+                                        getCommandesList();
+                                        getAllCmdeElements();
+                                      },
                                       child: Container(
                                         width: 120,
                                         height: 40,
@@ -352,8 +376,10 @@ class _CommandePageState extends State<CommandePage> {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 3.0),
                                     child: GestureDetector(
-                                      onTap:(){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'M', cmde: commandesAll[index], ligneCdes: getLigneCommandes(commandesAll[index].id!),)));
+                                      onTap:() async {
+                                        await Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'M', cmde: allCommandes[index], ligneCdes: getLigneCommandes(allCommandes[index].id!),)));
+                                        getCommandesList();
+                                        getAllCmdeElements();
                                       },
                                       child: Container(
                                         width: 60,
@@ -401,17 +427,18 @@ class _CommandePageState extends State<CommandePage> {
                                                 // row has two child icon and text.
                                                 child: Row(
                                                   children: [
-                                                    FaIcon(FontAwesomeIcons.blackTie, color: Colors.grey,),
+                                                    //FaIcon(FontAwesomeIcons.blackTie, color: Colors.grey,),
+                                                    Icon(Icons.check_circle, color: Colors.grey,),
                                                     SizedBox(
                                                       // sized box with width 10
                                                       width: 10,
                                                     ),
-                                                    textOpenSans("Modèles commandes",16,Colors.black,TextAlign.left)
+                                                    textOpenSans("Retrait de la commande",16,Colors.black,TextAlign.left)
                                                   ],
                                                 ),
                                               ),
                                               // popupmenu item 2
-                                              PopupMenuItem(
+                                              /*PopupMenuItem(
                                                 value: 2,
                                                 // row has two child icon and text
                                                 child: Row(
@@ -438,7 +465,7 @@ class _CommandePageState extends State<CommandePage> {
                                                     textOpenSans("Dépenses",16,Colors.black,TextAlign.left)
                                                   ],
                                                 ),
-                                              ),
+                                              ),*/
                                               PopupMenuItem(
                                                 value: 2,
                                                 // row has two child icon and text
@@ -459,7 +486,7 @@ class _CommandePageState extends State<CommandePage> {
                                                 //Navigator.push(context, MaterialPageRoute(builder: (_)=>DepenseCommandePage()));
                                                 // if value 2 show dialog
                                               } else if (value == 2) {
-                                                Navigator.push(context, MaterialPageRoute(builder: (_) => DepenseCommandePage()));
+                                                //Navigator.push(context, MaterialPageRoute(builder: (_) => DepenseCommandePage()));
                                                // _showDialog(context);
                                               } else if (value == 3) {
 
@@ -468,7 +495,7 @@ class _CommandePageState extends State<CommandePage> {
                                                 });
 
                                               } else if (value == 4) {
-                                               // _showDialog(context);
+                                               /**/
                                               }
                                             },
                                           ),
@@ -478,19 +505,28 @@ class _CommandePageState extends State<CommandePage> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 3.0),
-                                    child: Container(
-                                      width: 60,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          color: Colors.red[400],
-                                          borderRadius: BorderRadius.circular(30)
-                                      ),
-                                      //color: Colors.blueAccent,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Icon(Icons.close, color: Colors.white,)
-                                        ],
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        if (await msgBoxYesNo('Annulation', 'Opération irréversible, \nAnnuler cette commande (${allCommandes[index].ref!}) ?', context)) {
+                                          cancelCommande(allCommandes[index].id!);
+                                          getCommandesList();
+                                          getAllCmdeElements();
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 60,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                            color: Colors.red[400],
+                                            borderRadius: BorderRadius.circular(30)
+                                        ),
+                                        //color: Colors.blueAccent,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Icon(Icons.close, color: Colors.white,)
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -503,17 +539,20 @@ class _CommandePageState extends State<CommandePage> {
                     ),
                   )
                 ),
-              )
-          )
+              ) : const Center(child: Text('Aucune Commande enregistrée'),)
+          ),
+          const SizedBox(height: 15),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'A',)));
+        onPressed: () async {
+          await Navigator.push(context, MaterialPageRoute(builder: (context) => CommandeSavePage(pageMode: 'A',)));
+          getCommandesList();
+          getAllCmdeElements();
         },
         child: Icon(CupertinoIcons.add),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -527,9 +566,9 @@ class _CommandePageState extends State<CommandePage> {
   
   List<LigneCommande> getLigneCommandes(int cmdeId){
     List<LigneCommande> ligneCommandes = [];
-    for(int i = 0; i < ligneCommandesAll.length; i++){
-      if(ligneCommandesAll[i].commande_id == cmdeId){
-        ligneCommandes.add(ligneCommandesAll[i]);
+    for(int i = 0; i < allLigneCommandes.length; i++){
+      if(allLigneCommandes[i].commande_id == cmdeId){
+        ligneCommandes.add(allLigneCommandes[i]);
       }
     }
     return ligneCommandes;
@@ -556,8 +595,8 @@ class _CommandePageState extends State<CommandePage> {
     if(response.statusCode == 200) {
 
       final responseBody = jsonDecode(response.body);
-      commandesAll.clear();
-      ligneCommandesAll.clear();
+      allCommandes.clear();
+      allLigneCommandes.clear();
 
       late Commande commande;
       late LigneCommande ligneCommande;
@@ -566,17 +605,19 @@ class _CommandePageState extends State<CommandePage> {
       for(int i = 0; i < responseBody['data']['commandes'].length; i++) { // Get all commandes
 
         commande = Commande.fromJson(responseBody['data']['commandes'][i]);
-        commandesAll.add(commande);
+        allCommandes.add(commande);
         for(int j = 0; j < responseBody['data']['commandes'][i]['ligne_commandes'].length; j++){ // Get all ligne commandes
           ligneCommande = LigneCommande.fromJson(responseBody['data']['commandes'][i]['ligne_commandes'][j]);
-          ligneCommandesAll.add(ligneCommande);
+          allLigneCommandes.add(ligneCommande);
         }
       }
     }
+    allCommandes.sort((a, b) => b.id!.compareTo(a.id!));
   }
 
-  // Get all the products and all the categories
-  Future<void> getAllProductsAndCategories() async {
+  // Get all the elements of saving order
+  Future<void> getAllCmdeElements() async {
+    isOK = false;
     String token = CnxInfo.token!;
     String bearerToken = 'Bearer $token';
 
@@ -585,67 +626,91 @@ class _CommandePageState extends State<CommandePage> {
       'Accept': 'application/json',
       'Authorization': bearerToken
     };
-
+    loadingProgress(true);
     final response = await http.get(
-      Uri.parse(r_product),
+      Uri.parse(r_commandeInfos),
       headers: myHeaders,
     );
+    loadingProgress(false);
+    final responseBody = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
 
-      final responseBody = jsonDecode(response.body);
+      isOK = true;
+
       late CategorieVetement categorieVetement;
       late Product product;
+      late ModeReglement modeReglement;
+      late Tva tva;
+      late Client client;
 
-      allCategories.clear();
-      allProducts.clear();
-
+      /// GET PRODUCTS AND CATEGORIES
+      CmdeVar.allCategories.clear();
+      CmdeVar.allProducts.clear();
       for(int i = 0; i < responseBody['data']['categorie_vetements'].length; i++){
         categorieVetement = CategorieVetement.fromJson(responseBody['data']['categorie_vetements'][i]);
-        allCategories.add(categorieVetement);
+        CmdeVar.allCategories.add(categorieVetement);
 
         for(int j = 0; j < responseBody['data']['categorie_vetements'][i]['catalogues'].length; j++){
           product = Product.fromJson(responseBody['data']['categorie_vetements'][i]['catalogues'][j]);
-          allProducts.add(product);
+          CmdeVar.allProducts.add(product);
         }
       }
-      isProductOk = true;
-    } else {
-      isProductOk = false;
-      Fluttertoast.showToast(msg: 'Chargement de données non effectué correctement!');
-    }
-  }
 
-  // Get all client list
-  Future<void> getAllClient() async {
-    String token = CnxInfo.token!;
-    String bearerToken = 'Bearer $token';
-
-    var myHeaders = {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': bearerToken
-    };
-
-    final response = await http.get(
-      Uri.parse(r_client),
-      headers: myHeaders,
-    );
-
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      allClients.clear();
-      late Client client;
-
+      /// GET CLIENT LIST
+      CmdeVar.allClients.clear();
       for(int i = 0; i < responseBody['data']['clients'].length; i++){
         client = Client.fromJson(responseBody['data']['clients'][i]);
-        allClients.add(client);
+        CmdeVar.allClients.add(client);
       }
-      isClientOk = true;
-      // Handle the response
+      CmdeVar.foundClients = CmdeVar.allClients;
+      CmdeVar.selectedClient = CmdeVar.foundClients[0];
+
+      /// GET MODE REGLEMENT LIST
+      CmdeVar.allModeReglements.clear();
+      for(int i = 0; i < responseBody['data']['mode_reglements'].length; i++){
+        modeReglement = ModeReglement.fromJson(responseBody['data']['mode_reglements'][i]);
+        CmdeVar.allModeReglements.add(modeReglement);
+      }
+
+      /// GET TVA LIST
+      CmdeVar.allTauxTva.clear();
+      for(int i = 0; i < responseBody['data']['tva'].length; i++){
+        tva = Tva.fromJson(responseBody['data']['tva'][i]);
+        CmdeVar.allTauxTva.add(tva);
+      }
+      CmdeVar.selectedTva = CmdeVar.allTauxTva[0];
+
     } else {
-      isClientOk = false;
-      Fluttertoast.showToast(msg: 'Chargement de données non effectué correctement!');
+      isOK = false;
+      Fluttertoast.showToast(msg: '${responseBody['messages']}');
+      Navigator.pop(context);
+    }
+
+  }
+
+
+  Future<void> cancelCommande(int commande_id) async {
+
+    String bearerToken = 'Bearer ${CnxInfo.token!}';
+    var headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': bearerToken,
+    };
+
+    var request = http.MultipartRequest('PUT', Uri.parse("$r_commande/${commande_id.toString()}/cancel"));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+    final responseString = await response.stream.bytesToString();
+
+    if (response.statusCode == 201) {
+      Fluttertoast.showToast(msg: 'Commande annulée avec succès !');
+    } else {
+      final responseData = jsonDecode(responseString);
+      Fluttertoast.showToast(msg: '${response.statusCode} Erreur lors de l\'annulation !');
     }
   }
 

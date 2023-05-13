@@ -259,7 +259,7 @@ class _ClientPageState extends State<ClientPage> {
           };
           allClients.add(dataMap);
         }
-
+        allClients.sort((a, b) => a['nom']!.compareTo(b['nom']!));
         setState(() {foundClients = allClients;});
 
         // Handle the response
@@ -277,6 +277,7 @@ class _ClientPageState extends State<ClientPage> {
     } else {
       results = allClients.where((element) => element['nom'].toString().toLowerCase().contains(enteredKeywords.toLowerCase())).toList();
     }
+    results.sort((a, b) => a['nom']!.compareTo(b['nom']!));
     setState(() {
       foundClients = results;
     });

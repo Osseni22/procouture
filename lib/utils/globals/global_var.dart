@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/custom_text.dart';
+import 'package:procouture/models/CategorieVetement.dart';
+import 'package:procouture/models/Client.dart';
+import 'package:procouture/models/Product.dart';
+import 'package:procouture/models/ConfigData.dart';
 
 
 class CnxInfo{
@@ -11,16 +15,23 @@ class CnxInfo{
   static String? userEmail;
   static int? atelierID;
   static String? token;
+  static String? symboleMonnaie;
+  static String? atelierLibelle;
 }
 
 class Globals{
   /// Global variables
   static int modeleSource = 0;
+  static bool isOK = false;
 
   /// Global functions
   // Convert a french date to an english date
   static String? convertDateFrToEn(String dateValue){
     return ('${dateValue.substring(6,10)}-${dateValue.substring(3,5)}-${dateValue.substring(0,2)}');
+  }
+  // Convert a french date to server date format
+  static String? convertDateServerFormat(String frenchDate){
+    return (frenchDate.replaceAll('/', '-'));
   }
   // Convert a french date to an english date
   static String? convertDateEnToFr(String dateValue){
@@ -28,27 +39,29 @@ class Globals{
   }
 }
 
-void infoSnackBar(String text, BuildContext context, {bool closeButton = false}){
-  ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: textLato('Veuillez renseigner les deux champs !', 12, Colors.white, TextAlign.start),
-        elevation: 5.0,
-        width: MediaQuery.of(context).size.width * .92,
-        padding: const EdgeInsets.symmetric(horizontal: 3),
-        margin: const EdgeInsets.only(bottom: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)
-        ),
-        showCloseIcon: closeButton,
-      )
-  );
-}
+class CmdeVar{
+  /// CLIENTS
+  static List<Client> allClients = [];
+  static List<Client> foundClients = [];
+  static Client? selectedClient;
 
-class GlobalSnackBar{
-static showSnackbar(scaffoldKey, String msg) {
-  scaffoldKey.currentState.showSnackBar(new SnackBar(
-      duration: Duration(milliseconds: 1000),
-      content: new Text(msg),
-      backgroundColor: Colors.grey[800]));
-}
+  /// PRODUCTS ET CATEGORIES
+  // Categories
+  static List<CategorieVetement> allCategories = [];
+  static CategorieVetement? selectedCategorieVetement;
+  static int? selectedCatVetIndex = 0;
+
+  // Products
+  static List<Product> allProducts = [];
+  static List<Product> productsByCategorie = [];
+  static Product? selectedProduct;
+  static List<bool> checked = [];
+
+  /// TVA
+  static List<Tva> allTauxTva = [];
+  static Tva? selectedTva;
+
+  /// MODE REGLEMENTS
+  static List<ModeReglement> allModeReglements = [];
+  static ModeReglement? selectedModeReg;
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:procouture/models/Produit.dart';
 import 'package:procouture/screens/confection/produit/product_view_page.dart';
 import 'package:procouture/screens/confection/produit/product_save_page.dart';
@@ -26,7 +27,7 @@ class CataloguePage extends StatefulWidget {
 class _CataloguePageState extends State<CataloguePage> {
 
   //List<String> familles = ['Toutes','Chemise','Pantalon','Robe','Veste','Tunique'];
-  int selectedIndex = 0;
+  int? selectedIndex;
   bool isLoading = false;
 
   List<Map<String, dynamic>> categories = [];
@@ -35,6 +36,7 @@ class _CataloguePageState extends State<CataloguePage> {
 
   @override
   void initState() {
+    selectedIndex = 0;
     getProductsList(true);
     super.initState();
   }
@@ -44,9 +46,9 @@ class _CataloguePageState extends State<CataloguePage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: myDefaultAppBar('Catalogue', context),
-      body: Column(
+      body: isLoading? LinearProgressIndicator(backgroundColor: Colors.transparent) : Column(
         children: [
-          isLoading? LinearProgressIndicator(backgroundColor: Colors.transparent,) : SizedBox(),
+          //isLoading? LinearProgressIndicator(backgroundColor: Colors.transparent,) : SizedBox(),
           const SizedBox(height: 10,),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -80,8 +82,11 @@ class _CataloguePageState extends State<CataloguePage> {
             ),
           ),
           const SizedBox(height: 15,),
+
+          /// Modeles views
           Expanded(
-              child: Padding(
+              child: productsByCategorie.isNotEmpty?
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 17.0),
                 child: Container(
                   color: Colors.transparent,
@@ -110,7 +115,7 @@ class _CataloguePageState extends State<CataloguePage> {
                               top: 13,
                               left:22,
                               child: GestureDetector(
-                                onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_) => ProductViewPage(imagePath: produits[currentIndex].image!,)));},
+                                onTap: (){Navigator.push(context, MaterialPageRoute(builder: (_) => ProductViewPage(image_av: productsByCategorie[currentIndex]['image_av'],image_ar: productsByCategorie[currentIndex]['image_ar'])));},
                                 child: Container(
                                   height: 144,
                                   width: 108,
@@ -147,7 +152,7 @@ class _CataloguePageState extends State<CataloguePage> {
                                         bottomRight: Radius.circular(22)
                                     )
                                 ),
-                                child: textMontserrat(productsByCategorie[currentIndex]['prix_ht'].toString(), 15, Colors.black, TextAlign.start),
+                                child: textMontserrat('${NumberFormat('#,###', 'fr_FR').format(productsByCategorie[currentIndex]['prix_ht'])} ${CnxInfo.symboleMonnaie}', 17, Colors.black, TextAlign.start),
                               )
                           ),
                           Positioned(
@@ -175,6 +180,7 @@ class _CataloguePageState extends State<CataloguePage> {
                                         child: IconButton(
                                           onPressed: () async {
                                             await Navigator.push(context, MaterialPageRoute(builder: (context) => ProduitSave(pageMode: 'M', categories: categories, productMap: productsByCategorie[currentIndex],)));
+                                            getProductsList(true);
                                           },
                                           icon: Icon(Icons.edit_note_rounded),color: Colors.black,)
                                     ),
@@ -205,13 +211,14 @@ class _CataloguePageState extends State<CataloguePage> {
                       )
                   ),
                 ),
-              )
+              ) : Center( child:Text('Aucun modèle pour la catégorie selectionnée'))
           )
         ],
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
             await Navigator.push(context, MaterialPageRoute(builder: (context) => ProduitSave(pageMode: 'A', categories: categories)));
+            getProductsList(true);
           },
           child : Icon(CupertinoIcons.add)
       ),
@@ -268,14 +275,14 @@ class _CataloguePageState extends State<CataloguePage> {
             "image_av": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['image_av'],
             "image_ar": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['image_ar'],
             "categorie_vetement_id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['categorie_vetement_id'],
-            "base_modele_id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['base_modele_id'],
+            "base_modele_id": responseBody['data']['categorie_vetements'][i]['catalogues'][j]['base_id'],
           };
           products.add(dataMap2);
         }
       }
     }
     //productsByCategorie = products;
-    runFilter(categories[selectedIndex]['id'].toString());
+    runFilter(categories[selectedIndex!]['id'].toString());
   }
 
   void runFilter(String categorie_id) {

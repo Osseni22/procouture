@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
 import 'package:photo_view/photo_view.dart';
 
+import '../../../models/Product.dart';
 import '../../../widgets/custom_text.dart';
 
 class ProductViewPage extends StatelessWidget {
-  final imagePath;
-  const ProductViewPage({Key? key, required this.imagePath}) : super(key: key);
+  final String? image_av;
+  final String? image_ar;
+  const ProductViewPage({Key? key, required this.image_av,required this.image_ar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class ProductViewPage extends StatelessWidget {
                 ),*/
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: PhotoView(imageProvider: AssetImage(imagePath))
+                    child: PhotoView(imageProvider: image_av != null? NetworkImage( image_av!): AssetImage('assets/images/shirt_logo.png') as ImageProvider)
                 ),
               ),
               const SizedBox(height: 10,),
@@ -55,7 +57,7 @@ class ProductViewPage extends StatelessWidget {
                 ),*/
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: PhotoView(imageProvider: AssetImage(imagePath))
+                    child: PhotoView(imageProvider: image_ar != null? NetworkImage( image_ar!): AssetImage('assets/images/shirt_logo.png') as ImageProvider)
                 ),
               ),
             ],

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:procouture/screens/confection/caisse/caisse_resultat_mensuel_page.dart';
-import 'package:procouture/screens/confection/caisse/creancier_page.dart';
-import 'package:procouture/screens/confection/caisse/depense_page.dart';
+import 'package:procouture/screens/confection/transaction/caisse_resultat_mensuel_page.dart';
+import 'package:procouture/screens/confection/transaction/creancier_page.dart';
+import 'package:procouture/screens/confection/transaction/depense_page.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
 import 'package:procouture/widgets/default_box_shadow.dart';

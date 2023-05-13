@@ -19,9 +19,9 @@ class ProduitSave extends StatefulWidget {
   // Mode d'ouverture de la page : Ajout ou modification
   final String pageMode;
   // Récuperer toutes les categories de vêtement depuis la page précédente
-  List<Map<String, dynamic>> categories;
+  final List<Map<String, dynamic>> categories;
   // Récuperer les informations du modèle en question en cas de modification
-  Map<String, dynamic>? productMap;
+  final Map<String, dynamic>? productMap;
   ProduitSave({Key? key, required this.pageMode, required this.categories, this.productMap}) : super(key: key);
 
   @override
@@ -29,6 +29,12 @@ class ProduitSave extends StatefulWidget {
 }
 
 class _ProduitSaveState extends State<ProduitSave> {
+
+  bool isSaved = false;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  bool fromDevice = false;
+  bool fromDevice2 = false;
+
   // Toutes les categories de vêtements
   List<Map<String, dynamic>> itemsCategories = [];
   String? categorieValue;
@@ -36,9 +42,9 @@ class _ProduitSaveState extends State<ProduitSave> {
 
   // Liste lieu d'enregistrement des produits
   List<String> itemsBaseModele = [
-    'Confection',
-    'Boutique',
-    'Confection et boutique',
+    'CONFECTION',
+    'BOUTIQUE',
+    'CONFECTION ET BOUTIQUE',
   ];
   String? baseModeleValue;
 
@@ -93,8 +99,9 @@ class _ProduitSaveState extends State<ProduitSave> {
       widget.productMap!['libelle'] != null ? designationCtrl.text = widget.productMap!['libelle'] : designationCtrl.text = '';
       widget.productMap!['prix_ht'] != null ? prixHtCtrl.text = widget.productMap!['prix_ht'].toString() : prixHtCtrl.text = '';
       categorieValue = widget.productMap!['categorie_vetement_id'].toString();
-
       setBaseModele();
+
+      //setBaseModele();
       if(widget.productMap?['image_av'].toString() != '' || widget.productMap?['image_av'].toString() != null) {
         getImageFileFromNetwork(widget.productMap!['image_av'].toString());
       }
@@ -107,6 +114,7 @@ class _ProduitSaveState extends State<ProduitSave> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: myDefaultAppBar('Fiche Modèle', context),
       body: Center(
         child: SingleChildScrollView(
@@ -165,6 +173,7 @@ class _ProduitSaveState extends State<ProduitSave> {
                                 ),
                                 child: IconButton(
                                   onPressed: () {
+                                    fromDevice = true;
                                     takeFirstPicture(ImageSource.camera);
                                   },
                                   icon: Icon(Icons.photo_camera, color: Colors.grey.shade500,),
@@ -229,6 +238,7 @@ class _ProduitSaveState extends State<ProduitSave> {
                                 ),
                                 child: IconButton(
                                   onPressed: () {
+                                    fromDevice2 = true;
                                     takeSecondPicture(ImageSource.camera);
                                   },
                                   icon: Icon(Icons.photo_camera, color: Colors.grey.shade500,),
@@ -435,7 +445,7 @@ class _ProduitSaveState extends State<ProduitSave> {
                     padding:  EdgeInsets.all(5),
                     decoration: BoxDecoration(
                         color: kProcouture_green,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(35),
                         boxShadow: [
                           BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -476,12 +486,12 @@ class _ProduitSaveState extends State<ProduitSave> {
   Future<void> createProduct(String categorieVetement, String libelle, String prix_ht, String base_modele) async {
 
     Map<String, String> data = {
-      "categorie_vetement": categorieVetement,
-      "libelle":  libelle,
-      "prix_ht": prix_ht,
-      "image_av": "",
-      "image_ar": "",
-      "base_modele": base_modele,
+      "categorie_vetement" : categorieVetement,
+      "libelle" :  libelle,
+      "prix_ht" : prix_ht,
+      "image_av" : "",
+      "image_ar" : "",
+      "base_modele" : base_modele,
     };
 
     String bearerToken = 'Bearer ${CnxInfo.token!}';
@@ -496,11 +506,11 @@ class _ProduitSaveState extends State<ProduitSave> {
 
     // add image file to multipart request
     if(_imageFileAvCompressed != null){
-      final image = await http.MultipartFile.fromPath('image_av', _imageFileAvCompressed!.path);
+      final image = await http.MultipartFile.fromPath('image_av', fromDevice? _imageFileAvCompressed!.path: _imageFileAv!.path);
       request.files.add(image);
     }
     if(_imageFileArCompressed != null){
-      final image = await http.MultipartFile.fromPath('image_ar', _imageFileArCompressed!.path);
+      final image = await http.MultipartFile.fromPath('image_ar', fromDevice2? _imageFileArCompressed!.path: _imageFileAr!.path);
       request.files.add(image);
     }
 
@@ -522,10 +532,10 @@ class _ProduitSaveState extends State<ProduitSave> {
 
     // handle response
     if (response.statusCode == 201) {
-      final responseData = jsonDecode(responseString);
-      print(responseData);
+      //final responseData = jsonDecode(responseString);
+      //print(responseData);
       Fluttertoast.showToast(msg: 'Modèle enregistré avec succès !');
-      Navigator.pop(context as BuildContext);
+      Navigator.pop(scaffoldKey.currentContext!);
     } else {
       Fluttertoast.showToast(msg: '${response.statusCode} Erreur lors de l\'enregistrement !');
       throw Exception('Failed to upload image');
@@ -557,11 +567,11 @@ class _ProduitSaveState extends State<ProduitSave> {
 
     // add image file to multipart request
     if(_imageFileAvCompressed != null){
-      final image = await http.MultipartFile.fromPath('image_av', _imageFileAvCompressed!.path);
+      final image = await http.MultipartFile.fromPath('image_av', fromDevice? _imageFileAvCompressed!.path: _imageFileAv!.path);
       request.files.add(image);
     }
     if(_imageFileArCompressed != null){
-      final image = await http.MultipartFile.fromPath('image_ar', _imageFileArCompressed!.path);
+      final image = await http.MultipartFile.fromPath('image_ar', fromDevice2? _imageFileArCompressed!.path: _imageFileAr!.path);
       request.files.add(image);
     }
 
@@ -586,7 +596,7 @@ class _ProduitSaveState extends State<ProduitSave> {
       final responseData = jsonDecode(responseString);
       print(responseData);
       Fluttertoast.showToast(msg: 'Modification effectuée avec succès !');
-      Navigator.pop(context as BuildContext);
+      Navigator.pop(scaffoldKey.currentContext!);
     } else {
       Fluttertoast.showToast(msg: '${response.statusCode} Erreur lors de l\'enregistrement !');
       throw Exception('Failed to upload image');
@@ -594,11 +604,11 @@ class _ProduitSaveState extends State<ProduitSave> {
   }
 
   String? getBaseModele(){
-    if(baseModeleValue == 'Confection'){
+    if(baseModeleValue == 'CONFECTION'){
       return '1';
-    } else if(baseModeleValue == 'Boutique'){
+    } else if(baseModeleValue == 'BOUTIQUE'){
       return '2';
-    } else if(baseModeleValue == 'Confection et boutique'){
+    } else if(baseModeleValue == 'CONFECTION ET BOUTIQUE'){
       return '3';
     } else {
       return null;
@@ -607,11 +617,11 @@ class _ProduitSaveState extends State<ProduitSave> {
   void setBaseModele(){
     setState(() {
       if(widget.productMap!['base_modele_id'].toString() == '1'){
-        baseModeleValue = 'Confection';
+        baseModeleValue = 'CONFECTION';
       } else if (widget.productMap!['base_modele_id'].toString() == '2'){
-        baseModeleValue = 'Boutique';
+        baseModeleValue = 'BOUTIQUE';
       } else if (widget.productMap!['base_modele_id'].toString() == '3'){
-        baseModeleValue = 'Confection et boutique';
+        baseModeleValue = 'CONFECTION ET BOUTIQUE';
       }
     });
   }
@@ -662,6 +672,11 @@ class _ProduitSaveState extends State<ProduitSave> {
       //targetHeight: 800, // The maximum height of the compressed image.
     );
     return compressedFile;
+  }
+  
+  // close
+  void close(BuildContext ctx){
+    Navigator.pop(ctx);
   }
 
 }

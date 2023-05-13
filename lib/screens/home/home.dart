@@ -6,6 +6,7 @@ import 'package:procouture/components/config_page.dart';
 import 'package:procouture/components/message_box.dart';
 import 'package:procouture/utils/globals/global_lists.dart';
 import 'package:procouture/utils/constants/color_constants.dart';
+import 'package:procouture/utils/globals/global_var.dart';
 
 import '../../components/boutique_page.dart';
 
@@ -45,12 +46,12 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Colors.grey[100],
         key: scaffoldKey,
         appBar: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
+          systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.dark
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
-          title: const Text('ProCouture Mobile',style: TextStyle(fontFamily: 'Montserrat', color: Colors.black),),
+          title: Text(CnxInfo.atelierLibelle!,style: TextStyle(fontFamily: 'Montserrat', color: Colors.black),),
           centerTitle: true,
         ),
         body: menuPages[currentIndex],
