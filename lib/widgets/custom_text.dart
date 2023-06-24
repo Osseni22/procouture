@@ -1,66 +1,81 @@
 import 'package:flutter/material.dart';
 
-Text textLato(String string, double size, Color color, TextAlign textAlign, {FontWeight fontWeight = FontWeight.normal}){
+Text textLato(String textString, double size, Color color, TextAlign textAlign,
+    {FontWeight fontWeight = FontWeight.normal, TextDecoration decoration = TextDecoration.none}){
   return Text(
-    string,
+    textString,
     textAlign: textAlign,
     style: TextStyle(
       fontSize: size,
       color: color,
       fontFamily: 'Lato',
       fontWeight: fontWeight,
+      decoration: decoration,
     ),
+    overflow: TextOverflow.ellipsis
   );
 }
 
-Text textMontserrat(String string, double size, Color color, TextAlign textAlign, {FontWeight fontWeight = FontWeight.normal}){
+Text textMontserrat(String textString, double size, Color color, TextAlign textAlign,
+    {FontWeight fontWeight = FontWeight.normal, TextDecoration decoration = TextDecoration.none}){
   return Text(
-    string,
+    textString,
     textAlign: textAlign,
+    overflow: TextOverflow.ellipsis,
     style: TextStyle(
-        fontSize: size,
-        color: color,
-        fontFamily: 'Montserrat',
+      fontSize: size,
+      color: color,
+      fontFamily: 'Montserrat',
       fontWeight: fontWeight,
+      decoration: decoration,
     ),
   );
 }
 
-Text textOpenSans(String string, double size, Color color, TextAlign textAlign, {FontWeight fontWeight = FontWeight.normal}){
+Text textOpenSans(String textString, double size, Color color, TextAlign textAlign,
+    {FontWeight fontWeight = FontWeight.normal, TextDecoration decoration = TextDecoration.none}){
   return Text(
-    string,
+    textString,
     textAlign: textAlign,
+    overflow: TextOverflow.ellipsis,
     style: TextStyle(
-        fontSize: size,
-        color: color,
-        fontFamily: 'Open Sans',
+      fontSize: size,
+      color: color,
+      fontFamily: 'Open Sans',
       fontWeight: fontWeight,
+      decoration: decoration,
     ),
   );
 }
 
-Text textRaleway(String string, double size, Color color, TextAlign textAlign, {FontWeight fontWeight = FontWeight.normal}){
+Text textRaleway(String textString, double size, Color color, TextAlign textAlign,
+    {FontWeight fontWeight = FontWeight.normal, TextDecoration decoration = TextDecoration.none}){
   return Text(
-    string,
+    textString,
     textAlign: textAlign,
+    overflow: TextOverflow.ellipsis,
     style: TextStyle(
-        fontSize: size,
-        color: color,
-        fontFamily: 'Raleway',
+      fontSize: size,
+      color: color,
+      fontFamily: 'Raleway',
       fontWeight: fontWeight,
+      decoration: decoration,
     ),
   );
 }
 
-Text textWorkSans(String string, double size, Color color, TextAlign textAlign, {FontWeight fontWeight = FontWeight.normal}){
+Text textWorkSans(String textString, double size, Color color, TextAlign textAlign,
+    {FontWeight fontWeight = FontWeight.normal, TextDecoration decoration = TextDecoration.none}){
   return Text(
-    string,
+    textString,
     textAlign: textAlign,
+    overflow: TextOverflow.ellipsis,
     style: TextStyle(
-        fontSize: size,
-        color: color,
-        fontFamily: 'Work Sans',
-        fontWeight: fontWeight,
+      fontSize: size,
+      color: color,
+      fontFamily: 'Work Sans',
+      fontWeight: fontWeight,
+      decoration: decoration,
     ),
   );
 }

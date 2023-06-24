@@ -526,19 +526,18 @@ class _ProduitSaveState extends State<ProduitSave> {
     // send multipart request and get response
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
+    final responseData = jsonDecode(responseString);
 
     // Disable Loading Progress
     progressIndicator(false);
 
     // handle response
     if (response.statusCode == 201) {
-      //final responseData = jsonDecode(responseString);
-      //print(responseData);
-      Fluttertoast.showToast(msg: 'Modèle enregistré avec succès !');
+      Fluttertoast.showToast(msg: responseData['messages']);
       Navigator.pop(scaffoldKey.currentContext!);
     } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Erreur lors de l\'enregistrement !');
-      throw Exception('Failed to upload image');
+      Fluttertoast.showToast(msg: responseData['messages']);
+      //throw Exception('Failed to upload image');
     }
   }
 
@@ -587,6 +586,7 @@ class _ProduitSaveState extends State<ProduitSave> {
     // send multipart request and get response
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
+    final responseData = jsonDecode(responseString);
 
     // Disable Loading Progress
     progressIndicator(false);
@@ -594,12 +594,12 @@ class _ProduitSaveState extends State<ProduitSave> {
     // handle response
     if (response.statusCode == 201) {
       final responseData = jsonDecode(responseString);
-      print(responseData);
-      Fluttertoast.showToast(msg: 'Modification effectuée avec succès !');
+      //print(responseData);
+      Fluttertoast.showToast(msg: responseData['messages']);
       Navigator.pop(scaffoldKey.currentContext!);
     } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Erreur lors de l\'enregistrement !');
-      throw Exception('Failed to upload image');
+      Fluttertoast.showToast(msg: responseData['messages']);
+      //throw Exception('Failed to upload image');
     }
   }
 
@@ -645,9 +645,9 @@ class _ProduitSaveState extends State<ProduitSave> {
 
     await file.writeAsBytes(bytes);
 
-   setState(() {
+    setState(() {
      _imageFileAv = file;
-   });
+    });
    
   }
 

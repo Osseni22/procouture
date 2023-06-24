@@ -22,6 +22,7 @@ class UserSave extends StatefulWidget {
 class _UserSaveState extends State<UserSave> {
 
   bool isSaving = false;
+  bool isObscure = true;
 
   TextEditingController nomCtrl = TextEditingController(text: '');
   TextEditingController prenomCtrl = TextEditingController(text: '');
@@ -77,14 +78,21 @@ class _UserSaveState extends State<UserSave> {
                           //color: Colors.white,
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
-                        child: TextField(
-                          controller: nomCtrl,
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Nom',
-                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: nomCtrl,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Nom',
+                                    hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
+                                ),
+                              ),
+                            ),
+                            textOpenSans('*', 18, Colors.red, TextAlign.start)
+                          ],
                         ),
                       ),
                       Container(
@@ -109,14 +117,21 @@ class _UserSaveState extends State<UserSave> {
                           //color: Colors.white,
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
-                        child: TextField(
-                          controller: userNameCtrl,
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Nom utilisateur',
-                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: userNameCtrl,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Nom utilisateur',
+                                    hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
+                                ),
+                              ),
+                            ),
+                            textOpenSans('*', 18, Colors.red, TextAlign.start)
+                          ],
                         ),
                       ),
                       Container(
@@ -141,15 +156,30 @@ class _UserSaveState extends State<UserSave> {
                           //color: Colors.white,
                             border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
-                        child: TextField(
-                          controller: motDePasseCtrl,
-                          keyboardType: TextInputType.text,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Mot de passe',
-                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: motDePasseCtrl,
+                                keyboardType: TextInputType.text,
+                                obscureText: isObscure,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Mot de passe',
+                                    hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey),
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isObscure = !isObscure;
+                                        });
+                                      },
+                                      icon: isObscure? Icon(Icons.visibility_outlined) : Icon(Icons.visibility_off_outlined),
+                                    )
+                                ),
+                              ),
+                            ),
+                            textOpenSans('*', 18, Colors.red, TextAlign.start)
+                          ],
                         ),
                       ),
                       Container(
@@ -158,15 +188,30 @@ class _UserSaveState extends State<UserSave> {
                           //color: Colors.white,
                             //border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
-                        child: TextField(
-                          controller: motDePasseCtrl2,
-                          keyboardType: TextInputType.text,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Confirmer mot de passe',
-                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: motDePasseCtrl2,
+                                keyboardType: TextInputType.text,
+                                obscureText: isObscure,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Confirmer mot de passe',
+                                  hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey),
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isObscure = !isObscure;
+                                      });
+                                    },
+                                    icon: isObscure? Icon(Icons.visibility_outlined) : Icon(Icons.visibility_off_outlined),
+                                  )
+                                ),
+                              ),
+                            ),
+                            textOpenSans('*', 18, Colors.red, TextAlign.start)
+                          ],
                         ),
                       ),
                     ],

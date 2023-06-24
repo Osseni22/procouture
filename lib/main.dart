@@ -7,6 +7,7 @@ import 'package:procouture/screens/confection/client/client_save_page.dart';
 import 'package:procouture/screens/home/home.dart';
 import 'package:procouture/screens/home/splash_screen.dart';
 import 'package:procouture/utils/globals/global_var.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
 
@@ -33,6 +34,16 @@ void main() async {
   } else {
     CnxInfo.deviceName = 'unknown';
   }
+
+  /// Recupérer dernière infos connexion
+  // get an instance of SharedPreferences
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  // get the login information using the keys that you used to save them
+  Globals.isAdmin = prefs.getBool('isAdmin');
+  Globals.isSaved = prefs.getBool('isSaved');
+  Globals.emailUsername = prefs.getString('email');
+  Globals.password = prefs.getString('password');
+
 
   // Forcer le mode Portrait au lancement
   SystemChrome.setPreferredOrientations([

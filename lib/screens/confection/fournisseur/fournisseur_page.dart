@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:procouture/components/message_box.dart';
-import 'package:procouture/screens/confection/employe/employe_session_page.dart';
+import 'package:procouture/screens/confection/employe/employe_menu_page.dart';
 import 'package:procouture/screens/confection/employe/employe_save_page.dart';
 import 'package:procouture/screens/confection/fournisseur/achat_page.dart';
 import 'package:procouture/screens/confection/fournisseur/fournisseur_save_page.dart';

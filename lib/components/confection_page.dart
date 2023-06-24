@@ -5,11 +5,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:procouture/screens/confection/client/client_page.dart';
 import 'package:procouture/screens/confection/commande/commande_page.dart';
+import 'package:procouture/screens/confection/employe/employe_menu_page.dart';
 import 'package:procouture/screens/confection/employe/employes_page.dart';
 import 'package:procouture/screens/confection/fournisseur/fournisseur_page.dart';
 
 import '../screens/confection/transaction/caisse_menu_page.dart';
-import '../screens/confection/produit/catalogue_page.dart';
+import '../screens/confection/product/catalogue_page.dart';
+import '../screens/confection/transaction/tresorerie_home_page.dart';
 import '../widgets/custom_text.dart';
 
 class ConfectionPage extends StatelessWidget {
@@ -163,7 +165,8 @@ class ConfectionPage extends StatelessWidget {
                   GestureDetector(
                     onTap: (){
                       HapticFeedback.mediumImpact();
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => EmployePage()));
+                      //Fluttertoast.showToast(msg: 'Disponible ultérieurement');
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => EmployeMenuPage()));
                     },
                     child: Container(
                       width: width/2 - 10,
@@ -181,11 +184,11 @@ class ConfectionPage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          textMontserrat('Tâches', 12, Colors.black, TextAlign.center),
+                          textMontserrat('Personnel', 12, Colors.black, TextAlign.center),
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.purple.withOpacity(0.7),
-                            child: Icon(Icons.task_rounded, size: 29,color: Colors.white),
+                            child: Icon(CupertinoIcons.rectangle_stack_person_crop_fill, size: 29,color: Colors.white),
                           ),
                         ],
                       ),
@@ -204,7 +207,7 @@ class ConfectionPage extends StatelessWidget {
                   GestureDetector(
                     onTap: (){
                       HapticFeedback.mediumImpact();
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => MenuCaise()));
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => TresorerieHomePage()));
                     },
                     child: Container(
                       width: width/2 - 10,
@@ -235,8 +238,8 @@ class ConfectionPage extends StatelessWidget {
                   GestureDetector(
                     onTap: (){
                       HapticFeedback.mediumImpact();
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> FournisseurPage()));
-                      //Fluttertoast.showToast(msg: 'Bien');
+                      //Navigator.push(context, MaterialPageRoute(builder: (context)=> FournisseurPage()));
+                      Fluttertoast.showToast(msg: 'Disponible ultérieurement');
                     },
                     child: Container(
                       width: width/2 - 10,
@@ -245,9 +248,9 @@ class ConfectionPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
-                                blurRadius: 10,
-                                spreadRadius: 2
+                              color: Colors.black.withOpacity(0.02),
+                              blurRadius: 10,
+                              spreadRadius: 2
                             )
                           ]
                       ),

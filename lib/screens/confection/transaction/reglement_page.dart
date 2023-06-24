@@ -176,8 +176,8 @@ class _ReglementPageState extends State<ReglementPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(context, MaterialPageRoute(builder: (_)=> ReglementSavePage(commande: commande!)));
-          getReglements();
           getCommande();
+          getReglements();
         },
         child: Icon(CupertinoIcons.add),
       ),
@@ -222,6 +222,7 @@ class _ReglementPageState extends State<ReglementPage> {
         Reglement reglement = Reglement.fromJson(responseBody['data']['reglements'][i]);
         allReglements.add(reglement);
       }
+      allReglements.sort((a, b) => b.id!.compareTo(a.id!));
     } else {
       final responseBody = jsonDecode(response.body);
       //print(responseBody);

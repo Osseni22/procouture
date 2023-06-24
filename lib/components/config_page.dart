@@ -18,8 +18,168 @@ class ConfigPage extends StatelessWidget {
     String nomPolice = 'Raleway';
 
     return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: ListView(
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textMontserrat('   Compte', 12, Colors.grey, TextAlign.start, fontWeight: FontWeight.bold),
+          SizedBox(height: 5,),
+          Container(
+            height: 180,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.white
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_) => MonComptePage()));},
+                  child: ListTile(
+                    leading: Icon(Icons.store_mall_directory_rounded,color: Colors.green),
+                    title: textMontserrat('Mon Compte', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+                InkWell(
+                  onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_)=> UserConfigPage()));},
+                  child: ListTile(
+                    leading: Icon(Icons.group,color: Colors.blue),
+                    title: textMontserrat('Utilisateurs', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+                InkWell(
+                  onTap: (){ Navigator.of(context).push(MaterialPageRoute(builder: (_)=> const Livraison()));},
+                  child: ListTile(
+                    leading: FaIcon(FontAwesomeIcons.bell,color: Colors.red),
+                    title: textMontserrat('Notifications de livraison', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16,),
+          textMontserrat('   Configuration', 12, Colors.grey, TextAlign.start, fontWeight: FontWeight.bold),
+          SizedBox(height: 5,),
+          Container(
+            height: 180,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ListeMesuresPage()));},
+                  child: ListTile(
+                    leading: Icon(Icons.list_alt_rounded,color: Colors.pink),
+                    title: textMontserrat('Liste des mesures', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+                InkWell(
+                  child: ListTile(
+                    leading: Icon(Icons.monetization_on_rounded,color: Colors.purple),
+                    title: textMontserrat('Abonnement', 15, Colors.black, TextAlign.start),
+                  ),
+                  //onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_)=>FamillePage()));},
+                ),
+                InkWell(
+                  child: ListTile(
+                    leading: Icon(Icons.support_agent_rounded,color: Colors.blueGrey),
+                    title: textMontserrat('Support', 15, Colors.black, TextAlign.start),
+                  ),
+                  //onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_) => NomsMesurePage()));},
+                ),
+
+              ],
+            ),
+          ),
+          SizedBox(height: 16,),
+          textMontserrat('   Autres', 12, Colors.grey, TextAlign.start, fontWeight: FontWeight.bold),
+          SizedBox(height: 5,),
+          Container(
+            height: 180,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  child: ListTile(
+                    leading: Icon(Icons.language_outlined,color: Colors.cyan),
+                    title: textMontserrat('Langues', 15, Colors.black, TextAlign.start),
+                    trailing: PopupMenuButton<int>(
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                      ),
+                      onSelected: (int value){
+                        if (value == 2) {
+                          Fluttertoast.showToast(msg: 'English version is not available for the time being!', toastLength: Toast.LENGTH_LONG);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 1,
+                          // row has two child icon and text.
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/french-flag.png',fit: BoxFit.contain, height: 40, width: 40,),
+                              const SizedBox(width: 10,),
+                              textOpenSans("Français",16,Colors.black,TextAlign.left)
+                            ],
+                          ),
+                        ),
+                        // popupmenu item 2
+                        PopupMenuItem(
+                          value: 2,
+                          // row has two child icon and text
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/english-flag.png',fit: BoxFit.contain, height: 40, width: 40,),
+                              const SizedBox(width: 10,),
+                              textOpenSans("English",16,Colors.black,TextAlign.left)
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (_) => AProposPage()));},
+                  child: ListTile(
+                    leading: Icon(Icons.help,color: Colors.brown),
+                    title: textMontserrat('A propos', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+                InkWell(
+                  onTap: (){msgBoxLogOut(context);},
+                  child: ListTile(
+                    leading: Icon(Icons.exit_to_app_outlined,color: Colors.redAccent),
+                    title: textMontserrat('Se déconnecter', 15, Colors.black, TextAlign.start),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  /*Widget former(){
+    returnWidget former(){
+      return ListView(
         physics: const BouncingScrollPhysics(),
         children: [
           const SizedBox(height: 20,),
@@ -126,7 +286,6 @@ class ConfigPage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
+      );
+  }*/
 }

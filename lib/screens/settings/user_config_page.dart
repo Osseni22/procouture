@@ -9,7 +9,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:procouture/components/message_box.dart';
 import 'package:procouture/screens/confection/client/client_save_page.dart';
-import 'package:procouture/screens/settings/user_save_page.dart';
+import 'package:procouture/screens/admin/admin_user_save_page.dart';
 import 'package:procouture/services/api_routes/routes.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/screens/confection/client/client_session.dart';

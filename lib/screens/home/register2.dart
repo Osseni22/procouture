@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:procouture/screens/home/atelier_page.dart';
+import 'package:procouture/screens/admin/admin_atelier_page.dart';
 import 'package:procouture/utils/globals/global_var.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_app_bar.dart';
@@ -693,7 +693,9 @@ class _Register2State extends State<Register2> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    takeFirstPicture(ImageSource.gallery);
+                  },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade100
                   ),
@@ -858,7 +860,7 @@ class _Register2State extends State<Register2> {
     request.headers.addAll(headers);
 
     if(imageFile != null){
-      final image = await http.MultipartFile.fromPath('image', imageFile!.path);
+      final image = await http.MultipartFile.fromPath('atelier_logo', imageFile!.path);
       request.files.add(image);
     }
     loadingProgress(true);

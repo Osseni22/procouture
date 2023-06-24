@@ -1,4 +1,5 @@
-import 'LigneCommande.dart';
+import 'package:procouture/models/LigneCommande.dart';
+import 'package:procouture/models/ConfigData.dart';
 
 class Commande {
   // Member Variables
@@ -22,6 +23,7 @@ class Commande {
   int? client_id;
   int? user_id;
   List<LigneCommande>? ligne_commandes;
+  Tva? tva;
 
   // Constructor
   Commande({
@@ -45,6 +47,7 @@ class Commande {
     required this.client_id,
     required this.user_id,
     this.ligne_commandes,
+    this.tva
   });
 
   // Get instance data from a json data
@@ -69,6 +72,7 @@ class Commande {
         etat_retrait_id: json['etat_retrait_id'],
         client_id: json['client_id'],
         user_id: json['user_id'],
+        tva: json['tva'] != null ? Tva.fromJson(json['tva'] as Map<String, dynamic>) : null,
     );
   }
 

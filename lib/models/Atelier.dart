@@ -70,6 +70,7 @@ class Atelier {
     };
   }
 }
+
 /// Manage Currency
 class Monnaie {
   int? id;

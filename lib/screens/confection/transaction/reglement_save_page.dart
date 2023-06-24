@@ -8,6 +8,7 @@ import 'package:procouture/utils/constants/color_constants.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../models/Banque.dart';
 import '../../../models/Commande.dart';
 import '../../../models/ConfigData.dart';
 import '../../../services/api_routes/routes.dart';
@@ -32,9 +33,13 @@ class _ReglementSavePageState extends State<ReglementSavePage> {
 
   ModeReglement? selectedModeReg;
 
+  List<Banque> allBanques = [];
+  Banque? selectedBanque;
+
   @override
   void initState() {
     getAllModeReglements();
+    getAllBanques();
     ctrlDate.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
     super.initState();
   }
@@ -129,11 +134,11 @@ class _ReglementSavePageState extends State<ReglementSavePage> {
                       onChanged: (ModeReglement? value) {
                         setState(() {
                           selectedModeReg = value!;
-                          /*if(selectedModeReg != CmdeVar.allModeReglements[0]){
+                          if(selectedModeReg != CmdeVar.allModeReglements[0]){
                             showBanques = true;
                           } else {
                             showBanques = false;
-                          }*/
+                          }
                         });
                       },
                     ),
@@ -142,23 +147,23 @@ class _ReglementSavePageState extends State<ReglementSavePage> {
                     AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       height: showBanques? 50 : 0,
-                      child: DropdownButton<ModeReglement>(
+                      child: DropdownButton<Banque>(
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(8),
                         elevation: 8,
                         underline: SizedBox(),
                         hint: textMontserrat('Une banque',16,Colors.grey,TextAlign.left),
-                        value: selectedModeReg,
+                        value: selectedBanque,
                         icon: const Icon(Icons.arrow_drop_down_rounded),
-                        items: CmdeVar.allModeReglements.map((ModeReglement modereglement) {
-                          return DropdownMenuItem<ModeReglement>(
-                            value: modereglement,
-                            child: textMontserrat(modereglement.libelle!,16,Colors.black, TextAlign.left),
+                        items: allBanques.map((Banque banque) {
+                          return DropdownMenuItem<Banque>(
+                            value: banque,
+                            child: textMontserrat(banque.libelle!,16,Colors.black, TextAlign.left),
                           );
                         }).toList(),
-                        onChanged: (ModeReglement? value) {
+                        onChanged: (Banque? value) {
                           setState(() {
-                            selectedModeReg = value!;
+                            selectedBanque = value!;
                           });
                         },
                       ),
@@ -233,10 +238,9 @@ class _ReglementSavePageState extends State<ReglementSavePage> {
       'montant': ctrlAmount.text,
       'date': ctrlDate.text.replaceAll('/', '-'),
       'mode_reglement': selectedModeReg!.id.toString(),
-      //'banque': '1'
     });
     if (selectedModeReg != CmdeVar.allModeReglements[0]) {
-      request.fields.addAll(<String, String>{'banque' : '1'});
+      request.fields.addAll(<String, String>{'banque' : selectedBanque!.id.toString()});
     }
 
     request.headers.addAll(headers);
@@ -286,6 +290,35 @@ class _ReglementSavePageState extends State<ReglementSavePage> {
         CmdeVar.allModeReglements.add(modeReglement);
       }
       selectedModeReg = CmdeVar.allModeReglements[0];
+
+    } else {
+      final responseBody = jsonDecode(response.body);
+      Fluttertoast.showToast(msg: "${responseBody['message']}");
+    }
+
+  }
+  // Get all the mode reglements
+  Future<void> getAllBanques() async {
+
+    loadingProgress(true);
+    final response = await http.get(
+      Uri.parse(r_banquesUser),
+      headers: Globals.apiHeaders,
+    );
+    loadingProgress(false);
+
+    if (response.statusCode == 200) {
+
+      final responseBody = jsonDecode(response.body);
+      late Banque banque;
+      /// GET ALL BANKS
+      allBanques.clear();
+      for(int i = 0; i < responseBody['data']['banques'].length; i++){
+        banque = Banque.fromJson(responseBody['data']['banques'][i]);
+        allBanques.add(banque);
+      }
+      print(responseBody);
+      selectedBanque = allBanques[0];
 
     } else {
       final responseBody = jsonDecode(response.body);

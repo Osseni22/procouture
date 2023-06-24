@@ -13,6 +13,7 @@ import 'package:procouture/services/api_routes/routes.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/screens/confection/client/client_session.dart';
 import 'package:http/http.dart'as http;
+import 'package:procouture/models/Client.dart';
 
 import '../../../utils/globals/global_var.dart';
 
@@ -27,8 +28,8 @@ class _ClientPageState extends State<ClientPage> {
   bool searchBoolean = false;
   bool isLoading = false;
 
-  List<Map<String, dynamic>> allClients = [];
-  List<Map<String, dynamic>> foundClients = [];
+  List<Client> allClients = [];
+  List<Client> foundClients = [];
 
   @override
   void initState() {
@@ -119,44 +120,22 @@ class _ClientPageState extends State<ClientPage> {
                           child: InkWell(
                             splashColor: Colors.orange.withOpacity(0.1),
                             onTap: () {
-                              Map<String, dynamic> selectedClient = {
-                                "id": foundClients[index]['id'],
-                                "ref": foundClients[index]['ref'],
-                                "nom": foundClients[index]['nom'],
-                                "adresse": foundClients[index]['adresse'],
-                                "ville": foundClients[index]['ville'],
-                                "telephone1": foundClients[index]['telephone1'],
-                                "telephone2": foundClients[index]['telephone2'],
-                                "email": foundClients[index]['email'],
-                                "acompte": foundClients[index]['acompte'],
-                                "atelier_id": foundClients[index]['atelier_id'],
-                              };
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> SessionPage(map: selectedClient)));
+                              Client selectedClient = foundClients[index];
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> SessionPage(client: selectedClient)));
                             },
                             child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.orange,
-                                  child: textLato(index != null ? '${foundClients[index]['nom'].toString().toUpperCase()}'.substring(0,1) : '', 18, Colors.black, TextAlign.center),
+                                  child: textLato(foundClients[index].nom.toString().toUpperCase().substring(0,1), 18, Colors.black, TextAlign.center),
                                 ),
-                                title: textMontserrat('${foundClients[index]['nom']}', 16, Colors.black, TextAlign.left, fontWeight: FontWeight.w500),
-                                subtitle: textWorkSans('${foundClients[index]['telephone1']}', 12, Colors.black, TextAlign.left),
+                                title: textMontserrat('${foundClients[index].nom}', 16, Colors.black, TextAlign.left, fontWeight: FontWeight.w500),
+                                subtitle: textWorkSans('${foundClients[index].nom}', 12, Colors.black, TextAlign.left),
                                 trailing: CircleAvatar(
                                     backgroundColor: Colors.grey[200],
                                     child: IconButton(
                                       onPressed: () async {
-                                        Map<String, dynamic> selectedClient = {
-                                          "id": foundClients[index]['id'],
-                                          "ref": foundClients[index]['ref'],
-                                          "nom": foundClients[index]['nom'],
-                                          "adresse": foundClients[index]['adresse'],
-                                          "ville": foundClients[index]['ville'],
-                                          "telephone1": foundClients[index]['telephone1'],
-                                          "telephone2": foundClients[index]['telephone2'],
-                                          "email": foundClients[index]['email'],
-                                          "acompte": foundClients[index]['acompte'],
-                                          "atelier_id": foundClients[index]['atelier_id'],
-                                        };
-                                        await Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSave(pageMode: 'M', map: selectedClient,)));
+                                        Client selectedClient = foundClients[index];
+                                        await Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSavePage(pageMode: 'M', client: selectedClient,)));
                                         getClientList();
                                       },
                                       icon: Icon(Icons.edit_note_rounded),color: Colors.black,
@@ -181,7 +160,7 @@ class _ClientPageState extends State<ClientPage> {
       floatingActionButton: FloatingActionButton(
         elevation: 5.0,
         onPressed: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSave(pageMode: 'A', map: null,)));
+          await Navigator.push(context, MaterialPageRoute(builder: (context) => ClientSavePage(pageMode: 'A', client: null,)));
           getClientList();
         },
         isExtended: true,
@@ -241,25 +220,13 @@ class _ClientPageState extends State<ClientPage> {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        //print(responseBody);
         allClients.clear();
-
+        late Client client;
         for(int i = 0; i < responseBody['data']['clients'].length; i++){
-          Map<String, dynamic> dataMap = {
-            "id": responseBody['data']['clients'][i]['id'],
-            "ref": responseBody['data']['clients'][i]['ref'],
-            "nom": responseBody['data']['clients'][i]['nom'],
-            "adresse": responseBody['data']['clients'][i]['adresse'],
-            "ville": responseBody['data']['clients'][i]['ville'],
-            "telephone1": responseBody['data']['clients'][i]['telephone1'],
-            "telephone2": responseBody['data']['clients'][i]['telephone2'],
-            "email": responseBody['data']['clients'][i]['email'],
-            "acompte": responseBody['data']['clients'][i]['acompte'],
-            "atelier_id": responseBody['data']['clients'][i]['atelier_id'],
-          };
-          allClients.add(dataMap);
+          client = Client.fromJson(responseBody['data']['clients'][i]);
+          allClients.add(client);
         }
-        allClients.sort((a, b) => a['nom']!.compareTo(b['nom']!));
+        allClients.sort((a, b) => a.nom!.compareTo(b.nom!));
         setState(() {foundClients = allClients;});
 
         // Handle the response
@@ -270,17 +237,15 @@ class _ClientPageState extends State<ClientPage> {
   }
 
   void runFilter(String enteredKeywords){
-    List<Map<String, dynamic>> results = [];
+    List<Client> results = [];
     if(enteredKeywords.isEmpty){
       // If all the searchField is empty or only contains white-space, we get all the list
       results = allClients;
     } else {
-      results = allClients.where((element) => element['nom'].toString().toLowerCase().contains(enteredKeywords.toLowerCase())).toList();
+      results = allClients.where((element) => element.nom.toString().toLowerCase().contains(enteredKeywords.toLowerCase())).toList();
     }
-    results.sort((a, b) => a['nom']!.compareTo(b['nom']!));
-    setState(() {
-      foundClients = results;
-    });
+    results.sort((a, b) => a.nom!.compareTo(b.nom!));
+    setState(() {foundClients = results;});
 
   }
 

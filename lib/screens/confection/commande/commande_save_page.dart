@@ -552,13 +552,9 @@ class _CommandeSavePageState extends State<CommandeSavePage> {
                                 valeurRemiseCtrl.text = montantHT.toString();
                               }
                               setState(() {
-                                valeurRemiseCtrl.text =
-                                    int.parse(valeurRemiseCtrl.text).toString();
-                                tauxRemiseCtrl.text =
-                                    ((valeur * 100) / montantHT)
-                                        .toStringAsFixed(2);
-                                montantRemise =
-                                    int.parse(valeurRemiseCtrl.text);
+                                valeurRemiseCtrl.text = int.parse(valeurRemiseCtrl.text).toString();
+                                tauxRemiseCtrl.text = ((valeur * 100) / montantHT).toStringAsFixed(2);
+                                montantRemise = int.parse(valeurRemiseCtrl.text);
                                 calculMontantTTC();
                               });
                             }
@@ -619,15 +615,13 @@ class _CommandeSavePageState extends State<CommandeSavePage> {
                         child: TextField(
                           readOnly: true,
                           keyboardType: TextInputType.number,
-                          style: TextStyle(
-                              fontFamily: 'OpenSans', fontWeight: FontWeight
-                              .w400),
+                          style: TextStyle(fontFamily: 'OpenSans', fontWeight: FontWeight.w400),
                           textAlign: TextAlign.center,
                           controller: valeurTVACtrl,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintStyle: TextStyle(
-                                  fontFamily: 'OpenSans', color: Colors.grey)
+                              fontFamily: 'OpenSans', color: Colors.grey)
                           ),
                         ),
                       )
@@ -1536,123 +1530,123 @@ class _CommandeSavePageState extends State<CommandeSavePage> {
   }
 
   /// SELECTION DES CLIENTS
-  Container selectClient() {
-    return Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.8,
-      child: StatefulBuilder(
-        builder: (context, state) =>
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 15,),
-                  // Afficher le champ de recherche et le bouton de fermeture
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            alignment: Alignment.centerLeft,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(width: 10,),
-                                Icon(Icons.search, color: Colors.black,),
-                                SizedBox(width: 10,),
-                                Expanded(
-                                  child: TextField(
-                                    //controller: designationCtrl,
-                                    keyboardType: TextInputType.text,
-                                    textAlign: TextAlign.left,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Rechercher un client',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          color: Colors.grey),
+    Container selectClient() {
+      return Container(
+        height: MediaQuery
+            .of(context)
+            .size
+            .height * 0.8,
+        child: StatefulBuilder(
+          builder: (context, state) =>
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 15,),
+                    // Afficher le champ de recherche et le bouton de fermeture
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(width: 10,),
+                                  Icon(Icons.search, color: Colors.black,),
+                                  SizedBox(width: 10,),
+                                  Expanded(
+                                    child: TextField(
+                                      //controller: designationCtrl,
+                                      keyboardType: TextInputType.text,
+                                      textAlign: TextAlign.left,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: 'Rechercher un client',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            color: Colors.grey),
+                                      ),
+                                      onChanged: (value) {
+                                        runClientFilter(value);
+                                        setState(() {});
+                                        state(() {});
+                                      },
                                     ),
-                                    onChanged: (value) {
-                                      runClientFilter(value);
-                                      setState(() {});
-                                      state(() {});
-                                    },
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.close),
+                          Container(
+                            height: 50,
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(Icons.close),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Champ de recherche
-                  SizedBox(height: 5,),
-                  // Afficher ici la liste des clients
-                  Expanded(
-                    child: Container(
-                      child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: CmdeVar.foundClients.length,
-                          itemBuilder: (context, int index) =>
-                              InkWell(
-                                onTap: () {
-                                  CmdeVar.selectedClient =
-                                  CmdeVar.foundClients[index];
-                                  /*scaffoldKey.currentState?.*/
-                                  setState(() {
-                                    clientCtrl.text =
-                                    CmdeVar.selectedClient!.nom!;
-                                  });
-                                  //print(CmdeVar.selectedClient?.nom);
-                                  Navigator.pop(context);
-                                },
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.orange,
-                                    child: textLato(
-                                        CmdeVar.foundClients[index].nom
-                                            .toString().toUpperCase().substring(
-                                            0, 1), 18, Colors.black,
-                                        TextAlign.center),
-                                  ),
-                                  title: textMontserrat(
-                                      '${CmdeVar.foundClients[index].nom}', 16,
-                                      Colors.black, TextAlign.left,
-                                      fontWeight: FontWeight.w400),
-                                  //subtitle: textWorkSans('${CmdeVar.foundClients[index].telephone1}', 12, Colors.black, TextAlign.left),
-                                ),
-                              )
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 2,),
-                ],
+
+                    // Champ de recherche
+                    SizedBox(height: 5,),
+                    // Afficher ici la liste des clients
+                    Expanded(
+                      child: Container(
+                        child: ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount: CmdeVar.foundClients.length,
+                            itemBuilder: (context, int index) =>
+                                InkWell(
+                                  onTap: () {
+                                    CmdeVar.selectedClient =
+                                    CmdeVar.foundClients[index];
+                                    /*scaffoldKey.currentState?.*/
+                                    setState(() {
+                                      clientCtrl.text =
+                                      CmdeVar.selectedClient!.nom!;
+                                    });
+                                    //print(CmdeVar.selectedClient?.nom);
+                                    Navigator.pop(context);
+                                  },
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: Colors.orange,
+                                      child: textLato(
+                                          CmdeVar.foundClients[index].nom
+                                              .toString().toUpperCase().substring(
+                                              0, 1), 18, Colors.black,
+                                          TextAlign.center),
+                                    ),
+                                    title: textMontserrat(
+                                        '${CmdeVar.foundClients[index].nom}', 16,
+                                        Colors.black, TextAlign.left,
+                                        fontWeight: FontWeight.w400),
+                                    //subtitle: textWorkSans('${CmdeVar.foundClients[index].telephone1}', 12, Colors.black, TextAlign.left),
+                                  ),
+                                )
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 2,),
+                  ],
+                ),
               ),
-            ),
-      ),
-    );
-  }
+        ),
+      );
+    }
 
   // to label some fields
   Widget label(String text) {
@@ -2200,17 +2194,13 @@ class _CommandeSavePageState extends State<CommandeSavePage> {
 
     http.StreamedResponse response = await request.send();
     final responseString = await response.stream.bytesToString();
+    final responseData = jsonDecode(responseString);
 
     if (response.statusCode == 201) {
-      Fluttertoast.showToast(msg: 'Modification avec succès !');
+      Fluttertoast.showToast(msg: responseData['messages']);
       Navigator.pop(scaffoldKey.currentState!.context);
-    }
-    else {
-      final responseData = jsonDecode(responseString);
-      print(responseData);
-      Fluttertoast.showToast(
-          msg: '${response.statusCode} Erreur lors de l\'enregistrement !');
-      throw Exception('Failed to upload image');
+    } else {
+      Fluttertoast.showToast(msg: responseData['messages']);
     }
   }
 }

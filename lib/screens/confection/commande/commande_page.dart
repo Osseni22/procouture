@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:procouture/screens/confection/commande/commande_details_page.dart';
 import 'package:procouture/screens/confection/transaction/depenses_commande_page.dart';
 import 'package:procouture/screens/confection/transaction/reglement_page.dart';
 import 'package:procouture/screens/confection/commande/commande_save_page.dart';
@@ -247,7 +248,9 @@ class _CommandePageState extends State<CommandePage> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: allCommandes.length,
                   itemBuilder: (context, int index) => GestureDetector(
-                    onTap: (){ print('OK'); },
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => CommandeDetailsPage(commande: allCommandes[index], ligneCmdes: getLigneCommandes(allCommandes[index].id!),)));
+                    },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 15),
                       height: 230,

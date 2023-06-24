@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:procouture/screens/settings/user_save_page.dart';
+import 'package:procouture/screens/admin/admin_user_save_page.dart';
 import 'package:procouture/utils/constants/color_constants.dart';
 import 'package:procouture/utils/globals/global_var.dart';
 import 'package:procouture/widgets/custom_text.dart';
@@ -40,56 +40,13 @@ class _AtelierUsersPageState extends State<AtelierUsersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: myDefaultAppBar(widget.atelier!.libelle!,context),
+      appBar: myDefaultAppBar('Utilisateurs',context),
       body: isLoading ? LinearProgressIndicator(backgroundColor: Colors.transparent,)
           : Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 15),
+              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
               child: Column(
                 children: [
-                  AnimatedContainer(
-                    padding: EdgeInsets.only(left:10, top: 5, bottom: 5 ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: kProcouture_green
-                    ),
-                    duration: Duration(milliseconds: 500),
-                    height: isExpanded ? 150 : 60,
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                  child: Row(
-                                    children: [
-                                      textMontserrat("Solde : ", 19, Colors.white, TextAlign.start),
-                                      SizedBox(width: 5,),
-                                      textOpenSans("${widget.atelier!.solde.toString()} ${widget.atelier!.monnaie!.symbole!}", 22, Colors.white, TextAlign.start, fontWeight: FontWeight.w700)
-                                    ],
-                                  )
-                              ),
-                            ),
-                            IconButton(onPressed: (){
-                              setState(() {
-                                isExpanded = !isExpanded;
-                              });
-                            }, icon: !isExpanded? Icon(Icons.keyboard_double_arrow_down_sharp, color: Colors.white,): Icon(Icons.keyboard_double_arrow_up_sharp, color: Colors.white,))
-                          ],
-                        ),
-                        Expanded(
-                          child: Container(
-                            child: Center(
-                              child: Text("Informations a afficher ici", style: TextStyle(color: Colors.white),),
-                            ),
-                          )
-                        ),
-                      ],
-                    ),
-                  ),
                   SizedBox(height: 10,),
-                  textMontserrat('Liste des utilisateurs', 14, Colors.grey, TextAlign.center),
-                  //SizedBox(height: 10,),
                   Expanded(
                       child: allAtelierUsers.isNotEmpty ?
                       Container(
@@ -218,3 +175,46 @@ class _AtelierUsersPageState extends State<AtelierUsersPage> {
   }
 
 }
+
+/*
+AnimatedContainer(
+padding: EdgeInsets.only(left:10, top: 5, bottom: 5 ),
+decoration: BoxDecoration(
+borderRadius: BorderRadius.circular(12),
+color: kProcouture_green
+),
+duration: Duration(milliseconds: 500),
+height: isExpanded ? 150 : 60,
+child: Column(
+children: [
+Row(
+mainAxisAlignment: MainAxisAlignment.spaceBetween,
+children: [
+Expanded(
+child: Container(
+child: Row(
+children: [
+textMontserrat("Solde : ", 19, Colors.white, TextAlign.start),
+SizedBox(width: 5,),
+textOpenSans("${widget.atelier!.solde.toString()} ${widget.atelier!.monnaie!.symbole!}", 22, Colors.white, TextAlign.start, fontWeight: FontWeight.w700)
+],
+)
+),
+),
+IconButton(onPressed: (){
+setState(() {
+isExpanded = !isExpanded;
+});
+}, icon: !isExpanded? Icon(Icons.keyboard_double_arrow_down_sharp, color: Colors.white,): Icon(Icons.keyboard_double_arrow_up_sharp, color: Colors.white,))
+],
+),
+Expanded(
+child: Container(
+child: Center(
+child: Text("Informations a afficher ici", style: TextStyle(color: Colors.white),),
+),
+)
+),
+],
+),
+),*/

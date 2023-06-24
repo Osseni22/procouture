@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:procouture/screens/home/login.dart';
+import 'package:procouture/screens/home/login2.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:procouture/screens/home/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../utils/globals/global_var.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -51,8 +54,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 3));
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 3));
 
     animation1 = Tween<double>(begin: 40, end: 20).animate(CurvedAnimation(
         parent: _controller, curve: Curves.fastLinearToSlowEaseIn))
@@ -84,13 +86,17 @@ class _SplashScreenState extends State<SplashScreen>
       setState(() {
         if(_isFirstCall!){
           Navigator.pushReplacement(context, PageTransition(const AppIntroduction()));
-        } else {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));;
+        }
+        else {
+          if(Globals.isSaved != null && Globals.isSaved == true){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage2()));
+          } else {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()));
+          }
         }
         //Navigator.pushReplacement(context, PageTransition(_isFirstCall!? const AppIntroduction() : Login()));
       });
     });
-
 
   }
 
@@ -99,8 +105,6 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
                   'Procouture Mobile',
                   style: TextStyle(
                     color: Colors.green,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontSize: animation1.value,
                     fontFamily: 'Montserrat'
                   ),

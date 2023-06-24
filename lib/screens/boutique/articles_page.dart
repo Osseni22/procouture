@@ -71,7 +71,7 @@ class _ArticlePageState extends State<ArticlePage> {
                   mainAxisSpacing: 12.0,
                   mainAxisExtent: 260,
                 ),
-                itemCount: produits.length,
+                itemCount: product.length,
                 itemBuilder: (context, index) => Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -89,14 +89,14 @@ class _ArticlePageState extends State<ArticlePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap:(){ Navigator.push(context, MaterialPageRoute(builder: (_) => ArticleViewPage(imagePath: produits[index].image!,)));},
+                        onTap:(){ Navigator.push(context, MaterialPageRoute(builder: (_) => ArticleViewPage(imagePath: product[index].image!,)));},
                         child: ClipRRect(
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(14),
                             topRight: Radius.circular(14),
                           ),
                           child: Image.asset(
-                              produits[index].image!,
+                              product[index].image!,
                             width: double.infinity,
                             height: 180,
                             fit: BoxFit.cover,
@@ -113,9 +113,9 @@ class _ArticlePageState extends State<ArticlePage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    textRaleway(produits[index].libelle!, 11, Colors.black, TextAlign.start),
+                                    textRaleway(product[index].libelle!, 11, Colors.black, TextAlign.start),
                                     const SizedBox(height: 5,),
-                                    textMontserrat("${produits[index].prix.toString()} FCFA", 13, Colors.brown, TextAlign.start,fontWeight: FontWeight.bold),
+                                    textMontserrat("${product[index].prix.toString()} FCFA", 13, Colors.brown, TextAlign.start,fontWeight: FontWeight.bold),
                                   ],
                                 ),
                               ),

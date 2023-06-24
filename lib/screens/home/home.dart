@@ -51,12 +51,12 @@ class HomePageState extends State<HomePage> {
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
-          title: Text(CnxInfo.atelierLibelle!,style: TextStyle(fontFamily: 'Montserrat', color: Colors.black),),
+          title: Text(CnxInfo.atelierLibelle!,style: TextStyle(fontFamily: 'Montserrat', color: Colors.black, fontSize: 16),),
           centerTitle: true,
         ),
         body: menuPages[currentIndex],
         bottomNavigationBar: Container(
-          margin: EdgeInsets.all(displayWidth * .05),
+          margin: EdgeInsets.symmetric(horizontal: displayWidth * .05, vertical:  displayWidth * .01),
           height: displayWidth * .155,
           decoration: BoxDecoration(
             color: Colors.white,

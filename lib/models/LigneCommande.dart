@@ -1,3 +1,4 @@
+import 'package:procouture/models/Product.dart';
 class LigneCommande {
 
   // Members
@@ -13,6 +14,7 @@ class LigneCommande {
   int? commande_id;
   int? catalogue_id;
   String? image_av;
+  Product? product;
 
   // Constructor
   LigneCommande({
@@ -28,6 +30,7 @@ class LigneCommande {
     required this.commande_id,
     required this.catalogue_id,
     required this.image_av,
+    this.product
   });
 
   // Get instance data from a json data
@@ -45,6 +48,7 @@ class LigneCommande {
       commande_id: json['commande_id'],
       catalogue_id: json['catalogue_id'],
       image_av: json['image_av'],
+      product: json['catalogue'] != null ? Product.fromJson(json['catalogue'] as Map<String, dynamic>) : null
     );
   }
 

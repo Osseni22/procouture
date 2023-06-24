@@ -1,18 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:procouture/screens/confection/employe/avance_page.dart';
+import 'package:procouture/screens/confection/employe/employes_page.dart';
+import 'package:procouture/screens/confection/employe/paiements_page.dart';
+import 'package:procouture/screens/confection/employe/taches_libres_page.dart';
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:procouture/widgets/default_box_shadow.dart';
 import 'dart:ui';
 
 import '../../../widgets/default_app_bar.dart';
 
-class EmployeSession extends StatefulWidget {
+class EmployeMenuPage extends StatefulWidget {
   @override
-  _EmployeSessionState createState() => _EmployeSessionState();
+  _EmployeMenuPageState createState() => _EmployeMenuPageState();
 }
 
-class _EmployeSessionState extends State<EmployeSession>
+class _EmployeMenuPageState extends State<EmployeMenuPage>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<double> _animation2;
@@ -48,84 +54,40 @@ class _EmployeSessionState extends State<EmployeSession>
 
   @override
   Widget build(BuildContext context) {
-    double _w = MediaQuery.of(context).size.width;
+    double _width = MediaQuery.of(context).size.width;
+    double _height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: myDefaultAppBar('Session Employé',context),
+      appBar: myDefaultAppBar('Gestion du personnel',context),
       backgroundColor: Colors.white,
       body: Stack(
+        alignment: Alignment.center,
         children: [
           /// ListView
           ListView(
             //physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(_w / 17, _w / 20, _w / 17, _w / 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    textMontserrat("OSSENI ABDEL AZIZ", 20, Colors.black, TextAlign.start,fontWeight: FontWeight.w600),
-                    SizedBox(height: 10),
-                    textMontserrat('Poste : Couturier', 15, Colors.black54, TextAlign.start,fontWeight: FontWeight.w500),
-                    SizedBox(height: 3),
-                    textMontserrat('Salaire : 200 000 FCFA', 15, Colors.black45, TextAlign.start,fontWeight: FontWeight.w500),
-                    SizedBox(height: 3),
-                    textMontserrat('Commission : 120 000 FCFA', 15, Colors.black45, TextAlign.start,fontWeight: FontWeight.w500),
-                    SizedBox(height: 15),
-                  ],
-                ),
-              ),
+              SizedBox(height: _height * 0.15,),
               homePageCardsGroup(
                 Color(0xfff37736),
-                Icons.task_rounded,
-                'Tâches (Commission)',
+                CupertinoIcons.person_fill,
+                'Employés',
                 context,
-                RouteWhereYouGo(),
+                EmployePage(),
                 Color(0xffFF6D6D),
                 Icons.task_outlined,
                 'Tâches \nLibres',
-                RouteWhereYouGo(),
+                TachesLibresPage(),
               ),
               homePageCardsGroup(
-                  Colors.lightGreen,
-                  Icons.wallet,
-                  'Paiements',
-                  context,
-                  RouteWhereYouGo(),
-                  Color(0xffffa700),
-                  Icons.payments_outlined,
-                  'Avances',
-                  RouteWhereYouGo()),
-              /*homePageCardsGroup(
-                  Color(0xff63ace5),
-                  Icons.ad_units_outlined,
-                  'Example example example',
-                  context,
-                  RouteWhereYouGo(),
-                  Color(0xfff37736),
-                  Icons.article_sharp,
-                  'Example example',
-                  RouteWhereYouGo()),
-              homePageCardsGroup(
-                  Color(0xffFF6D6D),
-                  Icons.android,
-                  'Example example',
-                  context,
-                  RouteWhereYouGo(),
-                  Colors.lightGreen,
-                  Icons.text_format,
-                  'Example',
-                  RouteWhereYouGo()),
-              homePageCardsGroup(
-                  Color(0xffffa700),
-                  Icons.text_fields,
-                  'Example',
-                  context,
-                  RouteWhereYouGo(),
-                  Color(0xff63ace5),
-                  Icons.calendar_today_sharp,
-                  'Example example',
-                  RouteWhereYouGo()),*/
-             // SizedBox(height: _w / 20),
+                Colors.lightGreen,
+                Icons.wallet,
+                'Paiements',
+                context,
+                PaiementPage(),
+                Color(0xffffa700),
+                Icons.payments_outlined,
+                'Avances',
+                AvancePage(),),
             ],
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:procouture/models/Client.dart';
 import 'package:procouture/services/api_routes/routes.dart';
 import 'package:procouture/utils/constants/color_constants.dart';
 import 'package:procouture/widgets/custom_text.dart';
@@ -12,15 +13,15 @@ import 'package:http/http.dart' as http;
 
 import '../../../utils/globals/global_var.dart';
 
-class ClientSave extends StatefulWidget {
-  final String pageMode; Map<String, dynamic>? map;
-  ClientSave({Key? key, required this.pageMode, this.map}) : super(key: key);
+class ClientSavePage extends StatefulWidget {
+  final String pageMode; final Client? client;
+  ClientSavePage({Key? key, required this.pageMode, this.client}) : super(key: key);
 
   @override
-  State<ClientSave> createState() => _ClientSaveState();
+  State<ClientSavePage> createState() => _ClientSavePageState();
 }
 
-class _ClientSaveState extends State<ClientSave> {
+class _ClientSavePageState extends State<ClientSavePage> {
 
   /// CONTROLLERS
   TextEditingController nomCtrl = TextEditingController();
@@ -36,12 +37,12 @@ class _ClientSaveState extends State<ClientSave> {
   @override
   void initState() {
     if (widget.pageMode == 'M') {
-      nomCtrl.text = widget.map?['nom'];
-      widget.map!['telephone1'] != null ? telephone1Ctrl.text = widget.map!['telephone1'] : telephone1Ctrl.text = '';
-      widget.map!['telephone2'] != null ? telephone2Ctrl.text = widget.map!['telephone2'] : telephone2Ctrl.text = '';
-      widget.map!['ville'] != null ? villeCtrl.text = widget.map!['ville'] : villeCtrl.text = '';
-      widget.map!['adresse'] != null ? adresseCtrl.text = widget.map!['adresse'] : adresseCtrl.text = '';
-      widget.map!['email'] != null ? emailCtrl.text = widget.map!['email'] : emailCtrl.text = '';
+      nomCtrl.text = widget.client!.nom!;
+      widget.client?.telephone1 != null ? telephone1Ctrl.text = widget.client!.telephone1! : telephone1Ctrl.text = '';
+      widget.client!.telephone2 != null ? telephone2Ctrl.text = widget.client!.telephone2! : telephone2Ctrl.text = '';
+      widget.client!.ville != null ? villeCtrl.text = widget.client!.ville! : villeCtrl.text = '';
+      widget.client!.adresse != null ? adresseCtrl.text = widget.client!.adresse! : adresseCtrl.text = '';
+      widget.client!.email != null ? emailCtrl.text = widget.client!.email! : emailCtrl.text = '';
     }
     super.initState();
   }
@@ -71,8 +72,7 @@ class _ClientSaveState extends State<ClientSave> {
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           //color: Colors.white,
-                            border: Border(bottom: BorderSide(
-                                color: Colors.grey.withOpacity(0.08)))
+                            border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
                           controller: nomCtrl,
@@ -82,7 +82,7 @@ class _ClientSaveState extends State<ClientSave> {
                               prefixIcon: Icon(Icons.person),
                               hintText: 'Nom',
                               hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                              fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
                       ),
@@ -97,11 +97,10 @@ class _ClientSaveState extends State<ClientSave> {
                           controller: telephone1Ctrl,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.local_phone),
-                              hintText: 'Telephone 1',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.local_phone),
+                            hintText: 'Telephone 1',
+                            hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey),
                           ),
                         ),
                       ),
@@ -119,27 +118,25 @@ class _ClientSaveState extends State<ClientSave> {
                               border: InputBorder.none,
                               prefixIcon: Icon(CupertinoIcons.phone_fill),
                               hintText: 'Telephone 2',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                              hintStyle: TextStyle(fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
                       ),
                       Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          //color: Colors.white,
                             border: Border(bottom: BorderSide(
-                                color: Colors.grey.withOpacity(0.08)))
+                            color: Colors.grey.withOpacity(0.08)))
                         ),
                         child: TextField(
                           controller: villeCtrl,
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.location_city_rounded),
-                              hintText: 'Ville',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.location_city_rounded),
+                            hintText: 'Ville',
+                            hintStyle: TextStyle(
+                            fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
                       ),
@@ -154,11 +151,11 @@ class _ClientSaveState extends State<ClientSave> {
                           controller: adresseCtrl,
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.location_on_rounded),
-                              hintText: 'Adresse',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.location_on_rounded),
+                            hintText: 'Adresse',
+                            hintStyle: TextStyle(
+                            fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
                       ),
@@ -172,11 +169,11 @@ class _ClientSaveState extends State<ClientSave> {
                           controller: emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.alternate_email),
-                              hintText: 'Email',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', color: Colors.grey)
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.alternate_email),
+                            hintText: 'Email',
+                            hintStyle: TextStyle(
+                            fontFamily: 'Montserrat', color: Colors.grey)
                           ),
                         ),
                       ),
@@ -206,7 +203,8 @@ class _ClientSaveState extends State<ClientSave> {
                     } else {
                       updateClient(nomCtrl.text, adresseCtrl.text, villeCtrl.text,
                           telephone1Ctrl.text, telephone2Ctrl.text,
-                          emailCtrl.text);
+                          emailCtrl.text
+                      );
                     }
                   },
                   child: Container(
@@ -238,9 +236,8 @@ class _ClientSaveState extends State<ClientSave> {
                           isLoading ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2.0),
-                          ) : const SizedBox()
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0),
+                          ) : const SizedBox(),
                         ],
                       )
                   ),
@@ -276,23 +273,23 @@ class _ClientSaveState extends State<ClientSave> {
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
+    final responseString = await response.stream.bytesToString();
+    final responseData = jsonDecode(responseString);
 
-    print(response.stream.bytesToString());
+    //print(response.stream.bytesToString());
 
     if (response.statusCode == 201) {
-      Fluttertoast.showToast(msg: 'Client enregistré avec succès !');
+      Fluttertoast.showToast(msg: responseData['messages']);
       Navigator.pop(context);
     } else {
-      Fluttertoast.showToast(msg: '(${response.statusCode}) Client pas enregistré !');
+      Fluttertoast.showToast(msg: responseData['messages']);
     }
   }
-
-
 
   Future<void> updateClient(String nom, String adresse, String ville,
       String telephone1, String telephone2, String email) async {
 
-    String bearerToken = 'Bearer ${CnxInfo.token!}';
+    String bearerToken = "Bearer ${CnxInfo.token!}";
 
     Map<String, String> data = {
       "nom": nom,
@@ -304,27 +301,30 @@ class _ClientSaveState extends State<ClientSave> {
     };
 
     var headers = {
-      'Accept':'application/json',
-      'Content-Type':'application/json',
-      'Authorization': bearerToken,
+      "Accept" : "application/json",
+      "Content-Type" : "application/json",
+      "Authorization" : bearerToken,
     };
 
     final response = await http.put(
-      Uri.parse('$r_client/${widget.map!['id'].toString()}'),
+      Uri.parse('$r_client/${widget.client!.id!.toString()}'),
       headers: headers,
       body: jsonEncode(data),
     );
 
+    final jsonDecoder = JsonDecoder();
+    final jsonMap = jsonDecoder.convert(response.body);
+
     if (response.statusCode == 201) {
-      Fluttertoast.showToast(msg: 'Client modifié avec succès !');
+      Fluttertoast.showToast(msg: jsonMap['messages']);
       Navigator.pop(context);
     } else {
-      Fluttertoast.showToast(msg: '${response.statusCode} Client pas modifié !');
+      Fluttertoast.showToast(msg: jsonMap['messages']);
     }
 
   }
 
-  void sendingProgress(bool value) {
+  void progressIndicator(bool value) {
     if (value) {
       setState(() { isLoading = true; });
     } else {

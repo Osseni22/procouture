@@ -11,13 +11,14 @@ import 'package:procouture/screens/home/statistiques.dart';
 
 import 'package:procouture/widgets/custom_text.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:procouture/models/Client.dart';
 
 import '../commande/client_commande_page.dart';
 import 'package:procouture/screens/confection/client/client_matiere_page.dart';
 
 class SessionPage extends StatefulWidget {
-  Map<String, dynamic>? map;
-  SessionPage({Key? key, required this.map}) : super(key: key);
+  final Client client;
+  SessionPage({Key? key, required this.client}) : super(key: key);
 
   @override
   State<SessionPage> createState() => _SessionPageState();
@@ -35,11 +36,11 @@ class _SessionPageState extends State<SessionPage> {
 
   @override
   void initState() {
-    nomClient = widget.map!['nom'];
-    id = widget.map!['id'].toString();
-    widget.map!['telephone1'] != null ? tel1 = widget.map!['telephone1'] : tel1 = '';
-    widget.map!['telephone2'] != null ? tel2 = widget.map!['telephone2'] : tel2 = '';
-    widget.map!['ville'] != null ? ville = widget.map!['ville'] : ville = '';
+    nomClient = widget.client!.nom!;
+    id = widget.client!.id.toString();
+    widget.client!.telephone1 != null ? tel1 = widget.client!.telephone1! : tel1 = '';
+    widget.client!.telephone2 != null ? tel2 = widget.client!.telephone2! : tel2 = '';
+    widget.client!.ville != null ? ville = widget.client!.ville! : ville = '';
     super.initState();
   }
 
@@ -211,7 +212,7 @@ class _SessionPageState extends State<SessionPage> {
                       GestureDetector(
                         onTap: (){
                           HapticFeedback.mediumImpact();
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClientCommandePage()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => ClientCommandePage(client: widget.client,)));
                         },
                         child: Container(
                           width: width/2 - 10,

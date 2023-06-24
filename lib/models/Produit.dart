@@ -10,7 +10,7 @@ class Produit{
   Produit(this.id, this.libelle, this.prix, this.image);
 }
 
-List<Produit> produits = [
+List<Produit> product = [
   Produit(1, 'Chemise 1', 20000, 'assets/images/chemise1.jpg'),
   Produit(2, 'Chemise tunique courte femme', 30000, 'assets/images/chemise2.png'),
   Produit(3, 'Robe courte en pagne', 40000, 'assets/images/robe1.png'),

@@ -1,4 +1,6 @@
 import'package:procouture/models/ConfigData.dart';
+import'package:procouture/models/TypeTransaction.dart';
+import'package:procouture/models/CategorieDepense.dart';
 
 class Reglement{
 
@@ -58,7 +60,9 @@ class Transaction {
   int? user_id;
   int? type_transaction_id;
   int? base_id;
+  CategorieDepense? categorie_depense;
   ModeReglement? mode_reglement;
+  //TypeTransaction? type_transaction;
 
   Transaction({
     required this.id,
@@ -72,6 +76,8 @@ class Transaction {
     required this.type_transaction_id,
     required this.base_id,
     this.mode_reglement,
+    this.categorie_depense,
+    //this.type_transaction,
   });
 
   // Get Transaction from Json data
@@ -88,6 +94,59 @@ class Transaction {
       type_transaction_id: json['type_transaction_id'],
       base_id: json['base_id'],
       mode_reglement: json['mode_reglement'] != null ? ModeReglement.fromJson(json['mode_reglement'] as Map<String, dynamic>) : null,
+      //type_transaction: json['type_transaction'] != null ? TypeTransaction.fromJson(json['type_transaction'] as Map<String, dynamic>) : null,
+      categorie_depense: json['categorie_depense'] != null ? CategorieDepense.fromJson(json['categorie_depense'] as Map<String, dynamic>) : null,
+    );
+  }
+}
+
+class TransactionU {
+  int? id;
+  String? libelle;
+  String? date;
+  int? montant;
+  int? atelier_id;
+  int? mode_reglement_id;
+  int? categorie_depense_id;
+  int? user_id;
+  int? type_transaction_id;
+  int? base_id;
+  String? categorie_depense;
+  String? mode_reglement;
+  //TypeTransaction? type_transaction;
+
+  TransactionU({
+    required this.id,
+    required this.libelle,
+    required this.date,
+    required this.montant,
+    required this.atelier_id,
+    required this.mode_reglement_id,
+    required this.categorie_depense_id,
+    required this.user_id,
+    required this.type_transaction_id,
+    required this.base_id,
+    this.mode_reglement,
+    this.categorie_depense,
+    //this.type_transaction,
+  });
+
+  // Get Transaction from Json data
+  factory TransactionU.fromJson(Map<String, dynamic> json){
+    return TransactionU(
+      id: json['id'],
+      libelle: json['libelle'],
+      date: json['date'],
+      montant: json['montant'],
+      atelier_id: json['atelier_id'],
+      mode_reglement_id: json['mode_reglement_id'],
+      categorie_depense_id: json['categorie_depense_id'],
+      user_id: json['user_id'],
+      type_transaction_id: json['type_transaction_id'],
+      base_id: json['base_id'],
+      mode_reglement: json['mode_reglement']/* != null ? ModeReglement.fromJson(json['mode_reglement'] as Map<String, dynamic>) : null*/,
+      //type_transaction: json['type_transaction'] != null ? TypeTransaction.fromJson(json['type_transaction'] as Map<String, dynamic>) : null,
+      categorie_depense: json['categorie_depense']/* != null ? CategorieDepense.fromJson(json['categorie_depense'] as Map<String, dynamic>) : null*/,
     );
   }
 }
